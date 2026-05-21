@@ -793,7 +793,7 @@
             <div class="tab-nav">
                 <button class="tab-button active" onclick="showTab('overview')">Overview</button>
                 <button class="tab-button" onclick="showTab('setup')">Setup Guide</button>
-                <button class="tab-button" onclick="showTab('workflow')">4-Phase Workflow</button>
+                <button class="tab-button" onclick="showTab('workflow')">Workflow</button>
                 <button class="tab-button" onclick="showTab('outputs')">What You Get</button>
                 <button class="tab-button" onclick="showTab('design')">Design Standards</button>
                 <button class="tab-button" onclick="showTab('tips')">Tips & Hooks</button>
@@ -832,28 +832,28 @@
 curl -fsSL https://cli.kiro.dev/install | bash
                 </div>
 
-                <h3>The 4-Phase Workflow</h3>
+                <h3>The Workflow</h3>
 
                 <div class="workflow-grid">
                     <div class="workflow-card">
                         <div class="phase-number">1</div>
-                        <h4>Market Research</h4>
-                        <p>AI conducts web-based competitive analysis, market sizing, and customer pain point research.</p>
+                        <h4>Deep Market Research</h4>
+                        <p>6 parallel research dimensions with 120+ sources, quality gates, policy/risk/opportunity analysis, and a Challenge Check that stress-tests assumptions before proceeding.</p>
                     </div>
                     <div class="workflow-card">
                         <div class="phase-number">2</div>
                         <h4>PRFAQ</h4>
-                        <p>Amazon-style "Working Backwards" documentation with Press Release and FAQ sections.</p>
+                        <p>Amazon-style Working Backwards with Challenge Check &mdash; strengthens problem framing and ensures FAQ addresses genuine skepticism, not softballs.</p>
                     </div>
                     <div class="workflow-card">
                         <div class="phase-number">3</div>
                         <h4>PRD</h4>
-                        <p>Implementation-ready requirements in EARS syntax with personas and user stories.</p>
+                        <p>Implementation-ready requirements with current-year technology research, inline SVG architecture diagrams, and user stories in EARS format.</p>
                     </div>
                     <div class="workflow-card">
                         <div class="phase-number">4</div>
                         <h4>Prototype</h4>
-                        <p>Interactive HTML prototypes with modular screens and distinctive design.</p>
+                        <p>Interactive HTML with Chart.js visualizations, realistic state persistence, adversarial Bug Hunt, and modular screen architecture.</p>
                     </div>
                 </div>
 
@@ -978,7 +978,7 @@ kiro
                     <div class="code-block" style="background: var(--cream-dark); color: var(--charcoal);">
 "I want to build a fitness tracking app for teenagers that uses AI to create personalized workout plans."
                     </div>
-                    <p style="margin-top: 12px;">The steering files automatically guide the AI through the 4-phase workflow: Market Research → PRFAQ → PRD → Prototype.</p>
+                    <p style="margin-top: 12px;">The steering files automatically guide the AI through the workflow: Deep Market Research → PRFAQ → PRD → Prototype.</p>
                 </div>
 
                 <h3>Option B: Claude Code / Cursor</h3>
@@ -1109,10 +1109,11 @@ your-project/
 ├── <span class="highlight">.cursorrules</span>                  <span class="comment">(hidden - auto-loads in Cursor)</span>
 ├── prompts/
 │   ├── Claude_Code_Workflow.md    <span class="comment">(main workflow guide)</span>
-│   ├── Market Research Agent.md
+│   ├── Deep Research Agent.md
 │   ├── AI Framing Agent.md
 │   ├── PRFAQ Guide.md
 │   ├── PRD Creation Guide.md
+│   ├── Prototype Spec Guide.md
 │   └── Prototype Creation Guide.md
 │
 └── documents/                      <span class="comment">(auto-generated outputs)</span>
@@ -1127,18 +1128,20 @@ your-project/
         <!-- Workflow Tab -->
         <div id="workflow" class="tab-content">
             <div class="section">
-                <h2>The 4-Phase Workflow</h2>
-                <p>Each phase produces validated HTML documents. The workflow includes automatic validation checkpoints&mdash;it won't proceed until each phase passes quality checks.</p>
+                <h2>The Workflow</h2>
+                <p>Each phase produces validated HTML documents. The workflow includes automatic validation checkpoints, Challenge Checks that stress-test assumptions, and a Bug Hunt that finds and fixes interactive bugs before presenting to you.</p>
 
-                <h3>Phase 1: Market Research</h3>
-                <p><strong>AI automatically conducts:</strong></p>
+                <h3>Phase 1: Deep Market Research</h3>
+                <p><strong>AI researches across 6 parallel dimensions:</strong></p>
                 <ul>
-                    <li>Competitive landscape analysis (3-5 competitors)</li>
-                    <li>Market sizing with TAM/SAM/SOM and cited sources</li>
-                    <li>Customer pain points from reviews and forums</li>
-                    <li>Pricing intelligence and benchmarks</li>
-                    <li>Customer brand research (logo, colors) if building for a company</li>
+                    <li>Industry Landscape &mdash; market sizing, growth, disruption</li>
+                    <li>Competitive Intelligence &mdash; 5-7 competitors with pricing, strategy, gaps</li>
+                    <li>Customer &amp; Persona Deep Dive &mdash; pain points, workflow friction, buying behavior</li>
+                    <li>Technology Radar &mdash; emerging tech mapped to AWS services</li>
+                    <li>Adjacent Innovation &mdash; startups, new product launches</li>
+                    <li>Policy, Risk &amp; Opportunity &mdash; legislation, backlash, lawsuits, blue ocean signals</li>
                 </ul>
+                <p><strong>Quality gate:</strong> 120+ sources minimum, 15+ per dimension. Challenge Check stress-tests findings before proceeding.</p>
                 <p><strong>Output:</strong> <code>MarketResearch_[Product]_[Date].html</code></p>
 
                 <div class="callout warning">
@@ -1342,7 +1345,7 @@ samples/
                 <div class="hooks-category">
                     <h4>Automatic Validation</h4>
                     <div class="hooks-list">
-                        <div class="hook-item"><strong>Market Research Validator</strong><span>Checks TAM/SAM/SOM, competitors, sources</span></div>
+                        <div class="hook-item"><strong>Deep Market Research Validator</strong><span>Checks 120+ sources, 6 dimensions, quality gates</span></div>
                         <div class="hook-item"><strong>PRFAQ Quality Check</strong><span>Validates headline, problem, solution</span></div>
                         <div class="hook-item"><strong>PRD Requirements Validator</strong><span>EARS syntax, acceptance criteria</span></div>
                         <div class="hook-item"><strong>Design System Consistency</strong><span>Prevents AI slop aesthetics</span></div>
@@ -1386,8 +1389,8 @@ samples/
                 </div>
 
                 <div class="callout warning">
-                    <h4>Don't Skip Market Research</h4>
-                    <p>The PRFAQ and PRD are dramatically better when grounded in real competitive data. Market research is mandatory in the Kiro workflow.</p>
+                    <h4>Don't Skip Deep Market Research</h4>
+                    <p>The PRFAQ and PRD are dramatically better when grounded in real competitive data. Deep market research with 120+ sources is mandatory and cannot be skipped.</p>
                 </div>
 
                 <div class="callout warning">

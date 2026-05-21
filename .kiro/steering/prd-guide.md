@@ -13,6 +13,50 @@ Before creating PRD, ensure you have:
 - Market research summary (if available)
 - AI Framing document (for ML products)
 
+## Challenge Check (run BEFORE writing)
+
+Before writing the PRD, critically examine the PRFAQ and research:
+1. Would a skeptical VP with budget authority actually fund this? What would they push back on?
+2. What's the most likely way this product FAILS in market? (not a small setback — total failure)
+3. Is there a simpler version that validates the core hypothesis without the full feature set?
+4. What regulatory/political risk did we acknowledge but not actually mitigate in the solution?
+5. Are we solving the right problem for the right persona, or did we drift from the research?
+
+Use findings to identify requirements gaps, tighten acceptance criteria, and ensure the PRD addresses real objections.
+
+## Technology Research (REQUIRED — do this BEFORE writing technical sections)
+
+**Purpose:** Validate that all technology recommendations reflect what's available in the current year, not stale training data assumptions.
+
+**Step 1:** Determine the current year from the system date.
+
+**Step 2:** Run web searches across two tracks:
+
+**Track A — Build Stack (what to build WITH):**
+- "[capability area] frameworks [current year]"
+- "AWS [service category] new features [current year]"
+- "best [technology category] [current year]"
+- Focus on: frontend frameworks, backend runtimes, databases, AI/ML services, auth, infrastructure
+
+**Track B — Product Capabilities (what tech ENABLES features):**
+- "generative AI capabilities [product domain] [current year]"
+- "[feature type] API services available [current year]"
+- "Amazon Bedrock models [current year] capabilities"
+- Focus on: AI models, APIs, platform capabilities, third-party services
+
+**Step 3:** For every tech recommendation in the PRD:
+- Confirm it exists and is GA (or note if preview/beta)
+- Include a source link to documentation or announcement
+- Note the specific version or release date
+
+**Quality gate:** No tech recommendation without a current-year source link. If you can't verify availability, note it as "unverified — requires validation" and suggest alternatives.
+
+**Output:** Include a "Technology Landscape" section in the PRD documenting:
+- Recommended AWS services with current capabilities
+- Framework/runtime versions
+- AI model availability and capabilities
+- Any emerging tech that enables product features
+
 ## Dual Output Strategy
 
 Generate TWO outputs:
@@ -192,6 +236,9 @@ After creating PRD, generate the Kiro spec:
 ## Quality Checklist
 
 Before completing:
+- [ ] Technology Research completed (current-year validated)
+- [ ] Every tech recommendation has a source link confirming current-year availability
+- [ ] **Inline SVG architecture diagram included** (service boxes, arrows, data flow — styled with CSS variables)
 - [ ] All PRFAQ features have corresponding requirements
 - [ ] Requirements use EARS syntax correctly
 - [ ] Acceptance criteria are testable
