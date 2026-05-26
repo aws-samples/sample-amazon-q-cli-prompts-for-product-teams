@@ -13,13 +13,13 @@ This document contains standards and conventions that ALL specialized agents mus
 
 | Document Type | Example |
 |--------------|---------|
-| Market Research | `MarketResearch_TeenFit_[YYYY-MM-DD].json` |
+| Market Research | `MarketResearch_TeenFit_[YYYY-MM-DD].html` |
 | AI Framing | `AIFraming_TeenFit_[YYYY-MM-DD].md` |
 | PRFAQ | `PRFAQ_TeenFit_[YYYY-MM-DD].md` |
 | PRD | `PRD_TeenFit_[YYYY-MM-DD].md` |
 | Shared CSS | `teenfit.css` (`.css` extension, no date — stable filename) |
 | Design System Reference | `DesignSystem_TeenFit_[YYYY-MM-DD].html` (visual docs only) |
-| Prototype Spec | `Prototype_TeenFit_[YYYY-MM-DD].md` |
+| Prototype Spec | `PrototypeSpec_TeenFit_[YYYY-MM-DD].html` |
 | Individual Screen | `Screen_Dashboard_TeenFit_[YYYY-MM-DD].html` |
 | Clickable Prototype | `ClickablePrototype_TeenFit_[YYYY-MM-DD].html` |
 | Project Dashboard | `ProjectDashboard_TeenFit_[YYYY-MM-DD].html` |
@@ -39,9 +39,22 @@ project_root/
 ├── prompts/                    # Agent prompts (read-only)
 ├── templates/                  # Templates (read-only)
 └── documents/                  # Generated artifacts
+    ├── lib/                   # Bundled JS libraries (no CDN dependencies)
+    │   └── chart.min.js       # Chart.js 4.x UMD bundle (~156KB)
     ├── handoffs/              # Inter-agent communication logs
     └── [all generated files]
 ```
+
+### Bundled Libraries
+
+| Library | Path | Purpose | Include Pattern |
+|---------|------|---------|-----------------|
+| Chart.js 4.x | `documents/lib/chart.min.js` | Data visualization in prototype screens | `<script src="lib/chart.min.js"></script>` |
+
+**Rules for bundled libraries:**
+- Always reference via relative path from `documents/` (screens are siblings of `lib/`)
+- NEVER use external CDN URLs — all assets must work offline from the filesystem
+- Chart colors MUST use CSS variables (extracted via `getComputedStyle`) — never hardcoded hex
 
 ---
 

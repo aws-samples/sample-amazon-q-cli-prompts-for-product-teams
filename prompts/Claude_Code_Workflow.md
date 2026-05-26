@@ -18,17 +18,21 @@
 ## Workflow Overview
 
 ```
-Discovery → Market Research → [AI Framing] → PRFAQ → PRD → Prototype
-                               (optional)
+Discovery → Deep Market Research → [AI Framing] → PRFAQ → PRD → Prototype
+                                    (optional)
 ```
 
 | Phase | Output | Guide to Load |
 |-------|--------|---------------|
-| 1 | Market Research | `Market Research Agent.md` |
+| 1 | Deep Market Research (6 dimensions, 120+ sources) | `Deep Research Agent.md` |
 | 1b | AI Framing (ML products only) | `AI Framing Agent.md` |
 | 2 | PRFAQ | `PRFAQ Guide.md` |
 | 3 | PRD | `PRD Creation Guide.md` |
 | 4 | Prototype | `Prototype Creation Guide.md` |
+
+**Internal sub-steps (not user-visible phases):**
+- Technology Research runs inside Phase 3 (PRD) — see `PRD Creation Guide.md` Step 1.5
+- Prototype Spec runs at the start of Phase 4 (Prototype) — see `Prototype Spec Guide.md`
 
 **All outputs:** Standalone HTML files saved to `./documents/`
 
@@ -46,13 +50,16 @@ Discovery → Market Research → [AI Framing] → PRFAQ → PRD → Prototype
 
 ### Inform user about workflow mode:
 After gathering initial information, tell the user:
-> "I'll work through 4 phases: Market Research → PRFAQ → PRD → Prototype. By default, I'll pause after each phase for your feedback. If you'd prefer I work through everything continuously, just say 'switch to streamlined' at any time."
+> "I'll work through 4 phases: Deep Market Research → PRFAQ → PRD → Prototype. By default, I'll pause after each phase for your feedback. If you'd prefer I work through everything continuously, just say 'switch to streamlined' at any time."
 
 ### Determine if AI/ML product:
 **AI/ML indicators:** ML models, predictions, NLP, computer vision, recommendations, automated decisions, pattern recognition, generative AI.
 
-- **If AI/ML:** Include Phase 1b (AI Framing) after Market Research
+- **If AI/ML:** Include Phase 1b (AI Framing) after Deep Market Research
 - **If standard:** Skip Phase 1b, go directly to PRFAQ
+
+### Immediately begin research:
+After gathering the user's answers and informing them of the mode, proceed directly to Phase 1 (Deep Market Research). Do NOT ask permission to start research — begin immediately.
 
 ### Workflow Modes
 
@@ -73,42 +80,48 @@ After gathering initial information, tell the user:
 
 ## Step 2: Execute Phases
 
-### Phase 1: Market Research
+### Phase 1: Deep Research
 
-**Load:** `prompts/Market Research Agent.md`
+**Load:** `prompts/Deep Research Agent.md`
 
-> **Important:** Use web search to find real competitor data, pricing, market reports, and customer reviews. Don't make up data.
+> **Important:** Use web search to find real data. Don't make up statistics. This phase conducts rigorous multi-dimensional research across 6 parallel tracks.
 
-**Conduct web-based research:**
-1. **Competitive Landscape** (3-5 competitors)
-   - Product offerings and positioning
-   - Pricing models with actual figures
-   - Strengths and weaknesses
-2. **Market Sizing**
-   - TAM (Total Addressable Market) with sources
-   - SAM (Serviceable Addressable Market)
-   - SOM (Serviceable Obtainable Market)
-3. **Customer Pain Points**
-   - From reviews, forums, social media
-   - Specific quotes and examples
-   - Unmet needs in current solutions
-4. **Pricing Intelligence**
-   - Competitor pricing tiers
-   - Industry benchmarks
-5. **Brand Research** (if building for existing company)
-   - Logo, colors, typography
-   - Brand voice and positioning
+**Conduct deep research across 6 dimensions:**
+1. **Industry Landscape** — market size, growth, regulation, disruption, emerging segments
+2. **Competitive Intelligence** (5-7 competitors) — products, pricing, strategy, gaps, funding
+3. **Customer & Persona Deep Dive** — pain points, workflow friction, buying behavior, unmet needs
+4. **Technology Radar** — emerging tech mapped to AWS services, feasibility assessment
+5. **Adjacent Innovation** — startups, product launches, cross-industry approaches
+6. **Policy, Risk & Opportunity Landscape** — legislation, compliance, procurement, industry risks (security/backlash/lawsuits), emerging opportunities, blue ocean signals
+
+**Research protocol:**
+- 8-12 iterative web searches per dimension (adapt queries based on findings)
+- Fetch actual pages for pricing, features, and specifics (don't rely on snippets)
+- Cross-reference findings across dimensions
+- Flag contradictions where sources disagree
+
+**Quality gate (standard depth):**
+- Minimum 120 unique sources total
+- Minimum 15 sources per dimension
+- If any dimension falls below minimum, run additional searches until met
 
 **Save:**
 - `documents/MarketResearch_[Product]_[YYYY-MM-DD].html`
 
 **Checkpoint:**
-- [ ] TAM/SAM/SOM with dollar figures and sources
-- [ ] At least 3 competitors with real pricing
-- [ ] Pain points are specific, not generic
+- [ ] Minimum 120 unique sources (standard depth) or 150+ (comprehensive)
+- [ ] Each dimension has 15+ sources (standard) or 20+ (comprehensive)
+- [ ] Quality gate passed (no unresolved dimension deficits)
+- [ ] TAM/SAM/SOM with dollar figures and cited sources
+- [ ] At least 5 competitors with real pricing (fetched from their sites)
+- [ ] Pain points ranked by severity × frequency with sources
+- [ ] Technology radar maps capabilities to specific AWS services
+- [ ] Relevance tiers assigned to all sources (primary/supporting/background)
+- [ ] Every data claim has a superscript source citation link
+- [ ] Sources section grouped by dimension with relevance tier tags
+- [ ] Cross-dimensional insights noted (where findings corroborate)
+- [ ] Contradictions flagged explicitly
 - [ ] No placeholder text (TBD, TODO, [insert])
-- [ ] Every data claim has a source citation link
-- [ ] Sources section at bottom of document with numbered references
 - [ ] File saved successfully
 
 > **Full Approval Mode:** STOP here. Present summary and wait for user approval before proceeding.
@@ -145,6 +158,16 @@ After gathering initial information, tell the user:
 
 **Load:** `prompts/PRFAQ Guide.md`
 
+**Step 0: Challenge Check (internal — do not present as separate step to user)**
+Before writing the PRFAQ, critically examine the research inputs. Ask yourself:
+1. Is the pain point we identified actually severe enough to build a product around, or are we overweighting vocal minorities?
+2. Are we cherry-picking research that confirms our hypothesis while ignoring disconfirming evidence?
+3. What's the strongest argument that this market doesn't actually want a new solution?
+4. Which competitor could ship this feature next quarter and make our product irrelevant?
+5. Are the TAM/SAM numbers realistic or aspirational? What would make them collapse?
+
+Use findings to strengthen the PRFAQ — make the problem statement more defensible, the FAQ more genuinely skeptical, and the solution more clearly differentiated from what already exists.
+
 **Incorporate Market Research findings, then create:**
 1. Work through 5 Working Backwards questions:
    - Who is the customer? (use research insights)
@@ -174,25 +197,50 @@ After gathering initial information, tell the user:
 
 **Load:** `prompts/PRD Creation Guide.md`
 
-**Create from PRFAQ and Market Research:**
+**Step 0: Challenge Check (internal — do not present as separate step to user)**
+Before writing the PRD, critically examine the PRFAQ and research inputs. Ask yourself:
+1. Would a skeptical VP with budget authority actually fund this? What would they push back on?
+2. What's the most likely way this product FAILS in market? (not a small setback — total failure)
+3. Is there a simpler version that validates the core hypothesis without the full feature set?
+4. What regulatory/political risk did we acknowledge but not actually mitigate in the solution?
+5. Are we solving the right problem for the right persona, or did we drift from the research?
+
+Use findings to identify requirements gaps, tighten acceptance criteria, and ensure the PRD addresses real objections rather than building on unexamined assumptions.
+
+**Create from PRFAQ and Deep Research:**
+
+**Step 1: Technology Research** (do BEFORE writing technical sections)
+- Check the current year
+- Search for current-year availability of recommended technologies
+- Track A: Build Stack (frameworks, AWS services, runtimes available NOW)
+- Track B: Product Capabilities (AI models, APIs, platform features available NOW)
+- Every tech recommendation must have a source link confirming current-year availability
+
+**Step 2: Full PRD creation:**
 1. User personas with detailed profiles
 2. Requirements in EARS syntax (When/The/Shall)
 3. User stories with acceptance criteria
-4. Success metrics and business model
-5. Technical constraints (AWS/Anthropic stack)
-6. MLP Testing Plan (mandatory)
+4. Technology Landscape section (current-year validated)
+5. Technical architecture (informed by Technology Research)
+6. Success metrics and business model
+7. MLP Testing Plan (mandatory)
 
 **Save:**
 - `documents/PRD_[Product]_[YYYY-MM-DD].html`
 - `documents/DesignSystem_[Product]_[YYYY-MM-DD].html`
 
 **Checkpoint:**
+- [ ] Technology Research completed with current-year sources
+- [ ] Every tech recommendation has a source link confirming availability
 - [ ] Personas based on market research customer insights
+- [ ] **User stories defined** for each persona (As a... I want... so that...)
+- [ ] User stories have acceptance criteria in EARS format
 - [ ] Requirements traceable to PRFAQ
 - [ ] Competitive positioning informed by research
 - [ ] Testing plan included
 - [ ] Design system created (follows design standards)
-- [ ] Tech stack uses AWS-native services
+- [ ] Tech stack uses AWS-native services (validated as current-year available)
+- [ ] **Inline SVG architecture diagram included** in Technical Design section (REQUIRED)
 - [ ] Files saved successfully
 
 > **Full Approval Mode:** STOP here. Present summary and wait for user approval before proceeding.
@@ -203,7 +251,20 @@ After gathering initial information, tell the user:
 
 **Load:** `prompts/Prototype Creation Guide.md`
 
-**Create from PRD (modular structure required):**
+**Step 0a: Challenge Check (internal — do not present as separate step to user)**
+Before building the prototype, critically examine the PRD. Ask yourself:
+1. Are these the right screens, or are we building features nobody asked for?
+2. What would a first-time user hate about this flow after 30 seconds?
+3. Is there a critical user journey that's missing entirely from the screen list?
+4. Which requirements are actually P2 disguised as P0?
+5. What would happen if we launched with half these screens?
+
+Use findings to focus the prototype on what actually matters — cut screens that don't validate the core hypothesis, add edge cases to flows that feel fragile.
+
+**Step 0b: Generate Prototype Spec (internal — do NOT present to user as a separate phase):**
+Generate the Prototype Spec by loading `prompts/Prototype Spec Guide.md` and creating `documents/PrototypeSpec_[Product]_[YYYY-MM-DD].html`. This defines screen interactions, user flows, component behaviors, and state definitions. Use it to guide all screen building. Do NOT pause for user approval on the spec — proceed directly to building the prototype.
+
+**Create from PRD + Prototype Spec (modular structure required):**
 1. **Shared CSS file first** - `[product-slug].css` with design tokens and components (`.css` extension REQUIRED — browsers reject `.html` loaded as stylesheets)
 2. **Design System reference page** - `DesignSystem_*.html` (BEFORE any screens — governing spec, not post-hoc docs)
 3. **Design Token Contract** - extract CSS variable names, component classes, and theme mode (LIGHT/DARK) from the shared CSS for subagent prompts
@@ -262,12 +323,17 @@ After gathering initial information, tell the user:
 - [ ] Chat interfaces mocked with typing indicator and delayed responses (if applicable)
 - [ ] Modals open/close via button, X, backdrop, and Escape key
 - [ ] Data tables sort/filter/paginate (if applicable)
+- [ ] Data visualizations use bundled Chart.js (`lib/chart.min.js`, no external CDN)
+- [ ] Chart colors use CSS variables (not hardcoded hex)
+- [ ] Interactions produce visible state changes (not just toast messages)
+- [ ] State persists during session navigation (localStorage for mock data)
 - [ ] At least one animation or transition per screen
 - [ ] Loading/empty/error states present where applicable
 - [ ] Screens feel like working apps, not wireframes
 - [ ] Realistic data (no Lorem ipsum)
 - [ ] Follows design standards (no AI slop)
 - [ ] Post-build validation passed (see Prototype Creation Guide)
+- [ ] **Bug Hunt pass completed** (all interactions tested adversarially, bugs found and fixed)
 - [ ] Files saved successfully
 
 ---
@@ -298,10 +364,11 @@ After gathering initial information, tell the user:
 documents/
 ├── [product-slug].css                        (shared CSS — create FIRST)
 ├── ProjectDashboard_[Product]_[Date].html    (navigation hub)
-├── MarketResearch_[Product]_[Date].html      (Phase 1)
+├── MarketResearch_[Product]_[Date].html      (Phase 1 - Deep Research)
 ├── AIFraming_[Product]_[Date].html           (Phase 1b - AI/ML only)
 ├── PRFAQ_[Product]_[Date].html               (Phase 2)
 ├── PRD_[Product]_[Date].html                 (Phase 3)
+├── PrototypeSpec_[Product]_[Date].html       (internal — generated during Prototype phase)
 ├── DesignSystem_[Product]_[Date].html        (visual reference page)
 ├── ScreenIndex_[Product]_[Date].html         (screen navigation)
 ├── Screen_Dashboard_[Product]_[Date].html
@@ -321,11 +388,15 @@ documents/
 - [ ] Professional formatting and typography
 
 ### Cross-Phase Consistency:
-- [ ] Market research informs PRFAQ customer problem
+- [ ] Deep research informs PRFAQ customer problem
+- [ ] Technology radar findings inform PRD tech stack
 - [ ] Personas consistent across PRFAQ → PRD → Prototype
 - [ ] Competitive positioning consistent throughout
 - [ ] Success metrics coherent across documents
 - [ ] Technical constraints carried forward
+- [ ] Prototype Spec covers all PRD screens and flows
+- [ ] Prototype implements all Prototype Spec behaviors
+- [ ] Technology Research validated against current year
 
 ### Prototype Specific:
 - [ ] **Modular structure** (NOT single monolithic file)

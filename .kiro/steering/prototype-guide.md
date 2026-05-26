@@ -360,9 +360,21 @@ A visually striking navigation hub for reviewers. **Use the template at `.kiro/s
 - `[SCREEN_COUNT]` - Number of screens
 - `[SCREEN_CARDS]` - Generated screen card HTML
 
+### Data Visualization (Chart.js)
+
+For screens that need charts, graphs, or data visualizations:
+
+- **Include:** `<script src="lib/chart.min.js"></script>` at bottom of screen file (local file, NO CDN)
+- **Chart container:** Must have explicit height (e.g., `height: 300px`). Never `height: 100%`
+- **Theming:** Chart colors MUST use CSS variables extracted via `getComputedStyle` — never hardcode hex in Chart.js config
+- **States:** Implement loading skeleton, empty state, and error state for all chart containers
+- **Data:** Use realistic domain numbers, never placeholders
+
 ### File Structure Example
 ```
 ./documents/
+├── lib/
+│   └── chart.min.js                               (Chart.js 4.x — bundled, no CDN)
 ├── [product-slug].css                             (shared CSS — create FIRST)
 ├── DesignSystem_[Product]_[YYYY-MM-DD].html      (visual reference page)
 ├── ScreenIndex_[Product]_[YYYY-MM-DD].html       (navigation hub)
@@ -538,6 +550,34 @@ Scan all `Screen_*.html` files for layout pitfalls:
 2. **Logo markup:** Extract `<div class="sidebar-logo">` from every screen. All must use identical structure. Flag bare `<img>` tags, different wrappers, or inline styles on the logo.
 3. **No inline styles on shared-CSS elements:** Grep for `class="sidebar` or `class="nav-item` combined with `style=`. Flag matches.
 4. **Fix:** Replace non-conforming markup with the canonical sidebar shell template.
+
+### 11. Bug Hunt & Fix (REQUIRED — Assume Bugs Exist)
+
+After structural validation passes, assume the prototype has interactive bugs. Actively try to break every interaction.
+
+**Hunt (adversarial testing):**
+- Click every nav link on every screen — do they all navigate correctly?
+- Submit every form empty — do validation errors appear?
+- Submit with partial valid data — does inline validation work?
+- Click submit and verify loading state + visible state change (not just toast)
+- Open every modal → close via X, backdrop, AND Escape — do all three work?
+- Click every dropdown — does it open, select, close?
+- Sort/filter/paginate every data table — does data actually change?
+- Chat UI: send message → verify typing indicator → verify response appears
+- Make a change → navigate away → come back — is change still visible?
+- Review `<script>` blocks for undefined vars, null element listeners, unscoped globals
+
+**Plan:** Document all bugs found:
+```
+BUG #1: [Screen] — [Element] — Expected: [X] → Actual: [Y]
+  FIX: [specific change]
+```
+
+**Fix & Re-verify:** Fix all bugs, re-test each fix, check nothing else broke.
+
+**If you find zero bugs, you didn't test hard enough.** Go back and test more aggressively.
+
+---
 
 ## Quality Checklist
 

@@ -66,11 +66,12 @@ When a user mentions building a product, you MUST:
 ## Workflow Overview
 
 ```
-Discovery → Market Research → [VALIDATE] → PRFAQ → [VALIDATE] → PRD → [VALIDATE] → Prototype → [VALIDATE]
+Discovery → Deep Market Research → [VALIDATE] → PRFAQ → [VALIDATE] → PRD → [VALIDATE] → Prototype → [VALIDATE]
 ```
 
-**Four main phases:** Market Research, PRFAQ, PRD, Prototype
-**Optional phase:** AI Framing (only for AI/ML products, runs between Market Research and PRFAQ)
+**Four main phases:** Deep Market Research, PRFAQ, PRD, Prototype
+**Optional phase:** AI Framing (only for AI/ML products, runs between Deep Market Research and PRFAQ)
+**Internal sub-steps (not user-visible):** Technology Research (inside PRD), Prototype Spec (inside Prototype)
 
 ## Validation Agent Protocol
 
@@ -90,20 +91,37 @@ The validation agent checks:
 
 ## Phase Instructions
 
-### Phase 1: Market Research (ALWAYS FIRST)
+### Phase 1: Deep Research (ALWAYS FIRST)
 
 **This phase is mandatory and comes before everything else.**
 
-**Step 1: Search** - Use the built-in web_search tool to find:
-- Direct competitors (search: "[product type] companies", "alternatives to [similar product]")
-- Market size (search: "[industry] market size [current year]")
-- Customer pain points (search: "[target audience] challenges [problem area]")
-- Pricing benchmarks (search: "[category] pricing", "[competitor] pricing")
+**Research Architecture:** Conduct research across 6 parallel dimensions, each with 8-12 iterative web searches:
 
-**Step 2: Fetch Pages** - For each relevant search result, use the built-in web_fetch tool to read the actual page content:
+1. **Industry Landscape** — market size, growth, disruption, emerging segments
+2. **Competitive Intelligence** — 5-7 competitors with products, pricing, strategy, gaps, funding
+3. **Customer & Persona Deep Dive** — pain points, workflow friction, buying behavior, unmet needs
+4. **Technology Radar** — emerging tech mapped to AWS services, feasibility assessment
+5. **Adjacent Innovation** — startups, product launches, cross-industry approaches
+6. **Policy, Risk & Opportunity Landscape** — legislation, compliance, procurement, industry risks (security/backlash/lawsuits), emerging opportunities, blue ocean signals
+
+**Step 1: Search** - Use the built-in web_search tool across all 6 dimensions:
+- Industry: "[industry] market size [current year]", "[industry] growth forecast"
+- Competitors: "[product type] companies", "[competitor] pricing", "alternatives to [similar product]"
+- Customers: "[target audience] challenges [problem area]", "[target audience] pain points"
+- Technology: "AI applications [industry] [current year]", "AWS [service] [industry] use case"
+- Innovation: "startups solving [pain point]", "[industry] product launches [current year]"
+- Policy: "[industry] legislation [current year]", "[industry] AI regulation", "FedRAMP StateRAMP requirements"
+
+**Step 2: Fetch Pages** - For each relevant search result, use the built-in web_fetch tool:
 - Fetch competitor websites to extract pricing, features, positioning
 - Fetch market research pages to get actual TAM/SAM numbers with sources
 - Fetch review sites to understand real customer complaints
+- Fetch AWS documentation for technology radar findings
+
+**Quality Gate (ENFORCED):**
+- Standard depth: 120+ total sources, 15+ per dimension
+- If any dimension falls below minimum: run additional searches with broadened queries
+- Do NOT proceed until all dimensions meet thresholds
 
 **Step 3: Get Customer Brand Assets (REQUIRED for known companies)** - If building for a specific company:
 
@@ -168,23 +186,29 @@ Search in this order — stop when you have a candidate:
 - Key risks and opportunities
 - **Customer branding** (if applicable): logo URL, primary/secondary colors, fonts
 
-#### Validation: Market Research
+#### Validation: Deep Research
 Before proceeding, verify:
 - [ ] File saved to `./documents/MarketResearch_[ProductName]_[YYYY-MM-DD].html`
+- [ ] **Quality gate passed:** 120+ sources (standard) or 150+ (comprehensive), 15+/20+ per dimension
+- [ ] All 6 dimensions researched (Industry, Competitive, Customer, Technology, Innovation, Policy/Risk/Opportunity)
 - [ ] TAM/SAM/SOM includes actual dollar figures with cited sources
-- [ ] At least 3 competitors analyzed with real pricing data
-- [ ] Pain points are specific (not generic statements)
+- [ ] At least 5 competitors analyzed with real pricing data (fetched from their sites)
+- [ ] Pain points ranked by severity × frequency with source citations
+- [ ] Technology radar maps capabilities to specific AWS services
+- [ ] Relevance tiers assigned (primary/supporting/background)
+- [ ] Cross-dimensional insights noted where findings corroborate
+- [ ] Contradictions flagged explicitly
 - [ ] Pages were fetched (not just search snippets used)
 - [ ] No placeholder text like "TBD", "TODO", or "[insert]"
 - [ ] **If building for a known company:** actual logo URL captured (not just noted)
 - [ ] **If building for a known company:** brand colors extracted as hex values
 - [ ] **If building for a known company:** typography identified
 - [ ] Brand assets documented in a "Brand Guidelines" section of the research doc
-- [ ] Every data claim (TAM/SAM/SOM, competitor pricing, trends) has a source citation link
-- [ ] Sources section exists at bottom with numbered references
+- [ ] Every data claim has a superscript source citation link
+- [ ] Sources section grouped by dimension with relevance tier tags
 - [ ] Competitor entries link to their websites
 
-**FAIL if:** Missing sources, fewer than 3 competitors, or generic pain points. Fix and re-validate.
+**FAIL if:** Quality gate not met, missing dimensions, fewer than 5 competitors, generic pain points, or no technology radar. Fix and re-validate.
 
 > **Full Approval Mode:** STOP here. Present summary of market research findings and ask: "Ready to proceed to PRFAQ, or would you like changes?" Wait for user response.
 
@@ -213,6 +237,16 @@ Before proceeding, verify:
 
 ### Phase 2: PRFAQ Creation
 Reference `#steering/prfaq-guide.md` for detailed instructions.
+
+**Challenge Check (internal — run before writing):**
+1. Is the pain point actually severe enough to build a product around, or are we overweighting vocal minorities?
+2. Are we cherry-picking research that confirms our hypothesis while ignoring disconfirming evidence?
+3. What's the strongest argument that this market doesn't actually want a new solution?
+4. Which competitor could ship this feature next quarter and make our product irrelevant?
+5. Are the TAM/SAM numbers realistic or aspirational? What would make them collapse?
+
+Use findings to strengthen the PRFAQ — make the problem statement more defensible, the FAQ genuinely skeptical, and the solution clearly differentiated.
+
 Create Amazon-style Press Release and FAQ using Working Backwards methodology.
 
 Save to: `./documents/PRFAQ_[ProductName]_[YYYY-MM-DD].html`
@@ -232,10 +266,27 @@ Before proceeding, verify:
 
 > **Full Approval Mode:** STOP here. Present PRFAQ summary and ask: "Ready to proceed to PRD, or would you like changes?" Wait for user response.
 
-### Phase 3: PRD (Requirements)
+### Phase 3: PRD (Requirements + Technology Research)
 Reference `#steering/prd-guide.md` for detailed instructions.
 
-Convert PRFAQ into detailed requirements:
+**Challenge Check (internal — run before writing):**
+1. Would a skeptical VP with budget authority actually fund this? What would they push back on?
+2. What's the most likely way this product FAILS in market? (not a small setback — total failure)
+3. Is there a simpler version that validates the core hypothesis without the full feature set?
+4. What regulatory/political risk did we acknowledge but not actually mitigate in the solution?
+5. Are we solving the right problem for the right persona, or did we drift from the research?
+
+Use findings to identify requirements gaps, tighten acceptance criteria, and ensure the PRD addresses real objections.
+
+**Step 1: Technology Research (REQUIRED FIRST)**
+Before writing technical sections, validate that recommendations are current-year appropriate:
+- Check current year from system date
+- **Track A — Build Stack:** Search for current-year frameworks, AWS services, runtimes
+- **Track B — Product Capabilities:** Search for current-year AI models, APIs, platform capabilities
+- Every tech recommendation must have a source link confirming it exists NOW
+- If unverifiable, mark as "requires validation" and suggest alternatives
+
+**Step 2: Convert PRFAQ into detailed requirements:**
 - PRD document (`./documents/PRD_[ProductName]_[YYYY-MM-DD].html`)
 - Kiro spec files in `.kiro/specs/[product-slug]/`:
   - `requirements.md` - EARS format requirements
@@ -255,22 +306,70 @@ As an AWS-provided toolkit, technical designs prefer AWS services for enterprise
 
 #### Validation: PRD / Spec
 Before proceeding, verify:
+- [ ] **Technology Research completed** with current-year source links
+- [ ] Every tech recommendation validated against current-year availability
 - [ ] PRD file saved with correct naming
 - [ ] Kiro spec created in `.kiro/specs/[product-slug]/requirements.md`
 - [ ] Requirements use EARS syntax (When/The/Shall format)
-- [ ] User stories have acceptance criteria
+- [ ] **User stories defined** for all persona workflows (As a... I want... so that...)
+- [ ] User stories have EARS-format acceptance criteria
 - [ ] All PRFAQ features translated to requirements
-- [ ] Technical design uses AWS-native services
+- [ ] Technical design uses AWS-native services (current-year validated)
+- [ ] **Inline SVG architecture diagram included** in Technical Design section (service boxes, arrows, data flow)
 - [ ] No requirements are vague ("should be fast" → "shall respond in <200ms")
 - [ ] Edge cases and error states defined
 
-**FAIL if:** Missing EARS format, vague requirements, or non-AWS services without justification. Fix and re-validate.
+**FAIL if:** Missing EARS format, vague requirements, no architecture diagram, tech recommendations without current-year sources, or non-AWS services without justification. Fix and re-validate.
 
 > **Full Approval Mode:** STOP here. Present PRD summary and ask: "Ready to proceed to Prototype, or would you like changes?" Wait for user response.
+
+---
+
+### Internal: Prototype Spec (runs automatically at start of Prototype phase)
+Reference `#steering/prototype-spec-guide.md` for detailed instructions.
+**This is NOT a user-visible phase.** Generate the spec internally before building screens. Do NOT pause for user approval.
+
+Create an interaction specification that defines screen behaviors without making visual design decisions:
+1. **Screen inventory** — list all PRD screens, group by persona, assign filenames
+2. **Information architecture** — navigation hierarchy, breadcrumbs, deep-links
+3. **Screen-by-screen wireframe descriptions** — layout zones, content inventory, interactive elements, state definitions
+4. **User flows with edge cases** — happy path + error recovery for each flow
+5. **Component behavior definitions** — tables (sort/filter/paginate), forms (validation timing), modals (dismiss methods), chat UI, notifications
+6. **State transitions & navigation map** — valid transitions, conditional access, data flow between screens
+7. **Responsive behavior notes** — desktop/tablet/mobile breakpoints
+
+Save to: `./documents/PrototypeSpec_[ProductName]_[YYYY-MM-DD].html`
+
+#### Validation: Prototype Spec
+Before proceeding, verify:
+- [ ] Every PRD screen has a complete wireframe description
+- [ ] All user flows mapped with happy path + edge cases
+- [ ] Component behaviors defined (sort, filter, validate, dismiss patterns)
+- [ ] State definitions for each screen (empty, loading, error, loaded)
+- [ ] Navigation map shows all valid transitions
+- [ ] Entry/exit paths consistent across screens
+- [ ] **NO visual design decisions** (no colors, fonts, spacing)
+- [ ] Responsive behavior noted for each screen
+- [ ] File saved with correct naming
+
+**FAIL if:** Missing screens, visual design decisions included, or edge cases not documented. Fix and re-validate.
+
+**Do NOT stop for user approval.** Proceed directly to Prototype phase.
 
 ### Phase 4: Prototype
 Reference `#steering/prototype-guide.md` for detailed instructions.
 Apply design standards from `#steering/design-standards.md`.
+
+**Challenge Check (internal — run before building screens):**
+1. Are these the right screens, or are we building features nobody asked for?
+2. What would a first-time user hate about this flow after 30 seconds?
+3. Is there a critical user journey that's missing entirely from the screen list?
+4. Which requirements are actually P2 disguised as P0?
+5. What would happen if we launched with half these screens?
+
+Use findings to focus the prototype on what actually matters — cut screens that don't validate the core hypothesis, add edge cases to flows that feel fragile.
+
+**Input:** PRD + Prototype Spec (the spec defines all interactions; the Prototype implements them visually per the Design System).
 
 **IMPORTANT: Create MODULAR files, not a single monolithic HTML.**
 
@@ -319,6 +418,10 @@ Before marking complete, verify:
 - [ ] **Dropdowns/selects work** (open, select, close)
 - [ ] **Modals work** (open, close on X/backdrop/Escape)
 - [ ] **Data tables interactive** (sort, filter, paginate if applicable)
+- [ ] **Data visualizations** use bundled `lib/chart.min.js` (no external CDN scripts)
+- [ ] **Chart colors** use CSS variables (not hardcoded hex in Chart.js config)
+- [ ] **No toast-only responses** for data-mutating actions (create/edit/delete must update visible state)
+- [ ] **State persists** during session (edits visible after navigating away and back via localStorage)
 - [ ] Responsive at desktop, tablet, mobile breakpoints
 
 **Design Quality:**
@@ -359,7 +462,13 @@ Before marking complete, verify:
 open ./documents/Screen_[Name]_[ProductName]_[YYYY-MM-DD].html
 ```
 
-**FAIL if:** Monolithic single-file prototype, dead-end navigation, non-functional interactions (broken chat, static forms, non-working dropdowns/modals), generic aesthetics, placeholder content, wrong company's logo, or post-build validation not passed. Fix and re-validate.
+**Bug Hunt (REQUIRED — after post-build validation):**
+- [ ] **Bug Hunt pass completed** (every interaction tested adversarially, bugs found and fixed)
+- Assume bugs exist — test every button, form, modal, dropdown, table, chat, and nav link
+- Document bugs found, plan fixes, execute fixes, re-verify
+- If you find zero bugs, you didn't test hard enough — go back and test more aggressively
+
+**FAIL if:** Monolithic single-file prototype, dead-end navigation, non-functional interactions (broken chat, static forms, non-working dropdowns/modals), generic aesthetics, placeholder content, wrong company's logo, post-build validation not passed, or bug hunt not completed. Fix and re-validate.
 
 > **Full Approval Mode:** STOP here. Present completed prototype summary and ask: "All phases complete! Would you like to review the prototype, make changes, or run any analysis hooks (Customer Interview, Risk Analysis, etc.)?" Wait for user response.
 
@@ -373,9 +482,10 @@ All outputs saved to `./documents/`:
 ```
 
 Examples:
-- `MarketResearch_[ProductName]_[YYYY-MM-DD].html`
+- `MarketResearch_[ProductName]_[YYYY-MM-DD].html` (Deep Research)
 - `PRFAQ_[ProductName]_[YYYY-MM-DD].html`
-- `PRD_[ProductName]_[YYYY-MM-DD].html`
+- `PRD_[ProductName]_[YYYY-MM-DD].html` (includes Tech Research)
+- `PrototypeSpec_[ProductName]_[YYYY-MM-DD].html` (internal — generated during Prototype phase)
 - `[product-slug].css` (shared CSS — no date suffix, stable filename)
 - `DesignSystem_[ProductName]_[YYYY-MM-DD].html` (visual reference page)
 - `ScreenIndex_[ProductName]_[YYYY-MM-DD].html`
@@ -392,7 +502,7 @@ Save to: `./documents/ProjectDashboard_[ProductName]_[YYYY-MM-DD].html`
 
 ### Dashboard Contents
 - Project name and description
-- Progress bar showing current phase (Market Research → PRFAQ → PRD → Prototype)
+- Progress bar showing current phase (Deep Market Research → PRFAQ → PRD → Prototype)
 - Links to all generated documents (clickable file:// links)
 - Status indicators (completed/validated/in-progress/pending) for each phase
 - **Validation status for each phase** (passed/failed/pending)
@@ -452,9 +562,10 @@ Before completing any phase:
 
 | Phase | Key Checks | Common Failures |
 |-------|-----------|-----------------|
-| Market Research | Sources cited, 3+ competitors, fetched pages | Search snippets only, generic pain points |
+| Deep Research | 120+ sources (standard), 6 dimensions, quality gate passed, technology radar AWS-mapped, policy/risk/opportunity landscape, relevance tiers assigned | Below source minimum, missing dimensions, generic pain points, no tech radar, no policy/risk research |
 | PRFAQ | Compelling headline, specific solution, skeptical FAQs | Generic headline, softball questions |
-| PRD | EARS format, AWS/Anthropic only, acceptance criteria | Vague requirements, wrong tech stack |
+| PRD | Technology Research with current-year sources, EARS format, AWS-native, acceptance criteria | Stale tech recommendations, vague requirements, wrong tech stack |
+| Prototype Spec | All screens described, flows + edge cases, component behaviors, NO visual decisions | Missing screens, visual design leaking in, no edge cases |
 | Prototype | Modular files with shared `.css`, screen manifest, **fully interactive** (chat mocked, forms work, dropdowns/modals functional), working nav, Logo Gate passed, post-build validation passed, distinctive design, realistic data | Monolithic file, `.html` used as stylesheet, dead ends, static interactions, wrong company logo, generic aesthetics |
 
 **Remember:** Validation is not optional. Every phase must pass validation before proceeding. If you find yourself wanting to skip validation to save time, that's a sign the work needs improvement.

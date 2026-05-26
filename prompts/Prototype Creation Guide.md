@@ -746,6 +746,70 @@ These rules prevent the most common layout and scripting bugs in prototypes. All
 - Use `min-height: 100vh` for full-viewport layouts, not `height: 100%`
 - Dashboard stat cards and widget containers should use `min-height` rather than fixed `height` to allow content to expand
 
+#### Data Visualization with Chart.js
+
+**Include:** `<script src="lib/chart.min.js"></script>` at the bottom of any screen file that needs charts. This is a local file (no CDN, no cross-site requests). Never reference external CDN URLs for charting.
+
+**When to use:** Dashboard screens, analytics views, metrics panels, progress tracking — any screen where persona dashboard_widgets include charts, graphs, or data visualizations.
+
+**Chart types available:** bar, line, pie, doughnut, radar, scatter, bubble, polarArea.
+
+**Theming (MANDATORY):** Chart colors must come from CSS variables. Extract them via `getComputedStyle`:
+
+```html
+<div class="chart-container" style="height: 300px;">
+  <canvas id="revenue-chart"></canvas>
+</div>
+<script src="lib/chart.min.js"></script>
+<script>
+  const style = getComputedStyle(document.documentElement);
+  const primary = style.getPropertyValue('--brand-primary').trim();
+  const secondary = style.getPropertyValue('--brand-secondary').trim();
+  const textColor = style.getPropertyValue('--text-primary').trim();
+  const gridColor = style.getPropertyValue('--border-subtle').trim();
+  const surfaceBg = style.getPropertyValue('--surface-bg').trim();
+
+  new Chart(document.getElementById('revenue-chart'), {
+    type: 'line',
+    data: {
+      labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+      datasets: [{
+        label: 'Revenue ($K)',
+        data: [42, 58, 63, 71, 89, 102],
+        borderColor: primary,
+        backgroundColor: primary + '20',
+        tension: 0.3
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { labels: { color: textColor } },
+        tooltip: { backgroundColor: surfaceBg, titleColor: textColor, bodyColor: textColor, borderColor: gridColor, borderWidth: 1 }
+      },
+      scales: {
+        x: { ticks: { color: textColor }, grid: { color: gridColor } },
+        y: { ticks: { color: textColor }, grid: { color: gridColor } }
+      }
+    }
+  });
+</script>
+```
+
+**Rules:**
+- Container MUST have explicit height (`height: 300px` or `min-height: 250px`) — Canvas needs a sized parent
+- Set `responsive: true` and `maintainAspectRatio: false` for responsive behavior within the container
+- Use realistic domain data (never placeholder numbers or Lorem)
+- Multi-series charts: use brand-primary, brand-secondary, and accent colors from CSS variables
+- Never hardcode hex colors in Chart.js config — always extract from CSS variables
+
+**Chart states (implement all that apply):**
+- **Loading:** Show a skeleton/shimmer placeholder matching the chart container size
+- **Empty:** "No data yet" message with an icon and a CTA (e.g., "Import your first dataset")
+- **Error:** "Unable to load chart data" with a retry button
+- **Loaded:** The chart with realistic data
+
 #### Font Loading
 - All `@import url('https://fonts.googleapis.com/...')` statements MUST be in the shared CSS file ONLY
 - Screen files must NOT add their own `<link href="https://fonts.googleapis.com/...">` tags
@@ -828,27 +892,51 @@ function handleChatSend(userMessage) {
 **Forms (Full Mock Behavior):**
 - Input validation with inline error messages on blur
 - Loading state on submit (spinner in button, button disabled)
-- Success state after "submission" (toast, redirect, or inline message)
+- Success response must UPDATE VISIBLE STATE — not just show a toast:
+  - Create actions → new item appears in lists, optionally redirect to detail view
+  - Edit actions → changed fields reflect new values on screen
+  - Delete actions → item disappears from view with fade-out animation
+  - Form submissions → redirect to result screen OR update inline with success state
 - Error state with retry option
 - Auto-focus on first input on page load
+
 ```javascript
-// Required form behavior
+// Required form behavior — state must change, not just toast
 function handleFormSubmit(form) {
-    // 1. Validate
     if (!validateForm(form)) return showErrors();
 
-    // 2. Show loading
     showSubmitLoading();
 
-    // 3. Simulate API call
+    // Vary delay realistically (300-800ms for standard actions)
     setTimeout(() => {
         hideSubmitLoading();
-        // 4. Show success (or error)
-        showSuccessToast("Changes saved successfully!");
-        // Or navigate: window.location.href = 'Screen_Success_...html';
-    }, 1000);
+
+        // UPDATE VISIBLE STATE (primary feedback)
+        updateVisibleData(form.dataset.target, getFormData(form));
+        // e.g., add row to table, update card content, flip status badge
+
+        // Optional supplementary toast (brief, specific, NOT the primary feedback)
+        showToast('Project settings updated', 'success', 2000);
+
+        // OR navigate to result screen for create flows:
+        // window.location.href = 'Screen_Detail_...html';
+    }, randomDelay(400, 700));
+}
+
+// Persist state across screen navigation
+function updateVisibleData(target, data) {
+    const state = JSON.parse(localStorage.getItem('prototypeState') || '{}');
+    state[target] = { ...state[target], ...data };
+    localStorage.setItem('prototypeState', JSON.stringify(state));
+    // Update DOM: re-render list item, update field value, remove row, etc.
 }
 ```
+
+**Interaction Realism Rules:**
+- Toast as sole response is ONLY acceptable for: clipboard copy, background sync, notification preferences
+- Toast as sole response is NOT acceptable for: form submissions, create/edit/delete, status changes
+- Vary delays: quick actions (toggle) 300-500ms, standard (save) 500-800ms, heavy (upload) 1-2s with progress
+- Use localStorage to persist mock state so changes survive screen navigation
 
 **Dropdowns & Selects (Functional):**
 - Click to open dropdown menu
@@ -878,11 +966,16 @@ function handleFormSubmit(form) {
 - Pagination navigates between pages
 - Search filters results
 
-**Feedback:**
+**Feedback (interaction response hierarchy — use the FIRST applicable):**
+- **Direct visual change** — the PRIMARY feedback (row removed, field updated, toggle flipped, counter decremented)
+- **Transition/animation** — confirms the change happened (fade out, slide away, checkmark animation)
+- **Toast as supplement** — ONLY after the visual change is already visible, to provide context ("3 items archived")
+- **Toast as sole feedback** — ONLY for actions with no visible state change (copy to clipboard, background sync)
+
+**Additional feedback requirements:**
 - Hover states on all interactive elements
 - Click/tap feedback (button depression, ripple effect)
-- Loading indicators for async operations
-- Toast notifications for actions (auto-dismiss after 3-5 seconds)
+- Loading indicators for async operations (with varied delays: 300-800ms, not always 1s)
 - Success/error states are visually distinct
 
 ### Step 7: Build Clickable Prototype
@@ -1330,6 +1423,83 @@ grep -n 'class="stat-card' documents/Screen_*.html | grep 'style='
 Flag any matches. Elements styled by the shared CSS must not have inline style overrides.
 
 **d. Fix violations:** Replace non-conforming sidebar markup with the exact sidebar shell template. Remove inline styles on elements covered by shared CSS.
+
+---
+
+### Step 9.6: Bug Hunt & Fix (REQUIRED — Assume Bugs Exist)
+
+After structural validation passes, assume the prototype has interactive bugs. Your job is to find them, not confirm it works. This is adversarial testing — actively try to break every interaction.
+
+**Three-phase approach:**
+1. **Hunt** — Systematically test every interaction on every screen
+2. **Plan** — Document all bugs found with fix strategy
+3. **Fix** — Execute fixes, then re-verify each fix worked
+
+#### Bug Hunt Checklist (test adversarially)
+
+**Navigation:**
+- Click every link in sidebar nav on every screen — do they all navigate correctly?
+- Click every in-content link (cards, buttons, CTAs) — do they reach the right screen?
+- Click a nav link that goes to the current page — does it handle gracefully?
+- Verify browser back button behavior after navigating
+
+**Forms:**
+- Submit every form empty — do validation errors appear for all required fields?
+- Submit with one field valid, one invalid — does partial validation work?
+- Type in every text input — does it accept input (no accidental readonly/disabled)?
+- Click submit and verify loading state appears
+- After success, verify visible state changes (not just a toast)
+- Try submitting the same form twice rapidly — does it guard against double-submit?
+
+**Modals:**
+- Open every modal trigger — does the modal appear?
+- Close via X button, backdrop click, AND Escape key — do all three work?
+- Open a modal and click a button inside it — does the action work?
+- If modal has a form, submit it — does it process correctly and dismiss?
+
+**Data Tables (if present):**
+- Click every sort header — does the data actually reorder?
+- Apply a filter — do rows actually filter? Clear it — do all rows come back?
+- Navigate pagination — do different rows appear?
+- Click a row action — does it trigger the expected behavior?
+
+**Dropdowns/Selects:**
+- Click every dropdown — does it open?
+- Select an option — does the displayed value update?
+- Click outside — does it close?
+- Open one dropdown then click another — does the first close?
+
+**Chat UI (if present):**
+- Type a message and send — does it appear in the conversation?
+- Wait for response — does typing indicator appear, then a response?
+- Send multiple messages — do they stack correctly?
+- Verify auto-scroll to newest message
+
+**State Persistence:**
+- Make a change (edit, create, toggle) → navigate away → navigate back — is the change still visible?
+- Delete an item → navigate away → navigate back — is it still gone?
+
+**JavaScript Errors:**
+- Review every screen's `<script>` blocks for: undefined variables, event listeners on elements that might not exist, unscoped global variables that could conflict across screens
+
+#### Fix Plan Format
+
+After the hunt, document ALL bugs found:
+```
+BUG #1: [Screen filename] — [Element description] — Expected: [behavior] → Actual: [what happens]
+  FIX: [Specific code change — which file, which function, what to change]
+
+BUG #2: ...
+```
+
+#### Execute Fixes & Re-Verify
+
+1. Fix all documented bugs
+2. Re-test each fixed interaction to confirm the fix works
+3. Check that fixes didn't break adjacent interactions
+4. Only proceed to handoff after all bugs are resolved
+
+**If you find zero bugs, you didn't test hard enough.** Go back and test more aggressively — try edge cases, rapid clicks, unexpected input sequences.
 
 ---
 

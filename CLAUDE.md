@@ -6,12 +6,16 @@ This project transforms Claude into a product development partner, guiding you f
 
 When the user describes a product idea or asks to start product development, follow the workflow in `prompts/Claude_Code_Workflow.md`.
 
-**Workflow phases:**
-1. **Market Research** - Use web search to find competitors, market sizing, customer pain points
+**Workflow phases (user-facing):**
+1. **Deep Market Research** - 6 parallel research dimensions with 120+ sources and quality gates
 2. **AI Framing** (optional) - For AI/ML products only
 3. **PRFAQ** - Amazon-style Working Backwards documentation
 4. **PRD** - Detailed requirements with EARS syntax
 5. **Prototype** - Interactive HTML with modular screens
+
+**Internal sub-steps (agent executes, not presented to user as separate phases):**
+- Technology Research runs inside PRD (validates current-year tech availability)
+- Prototype Spec runs at the start of Prototype (defines interactions before screen building)
 
 **Key rules:**
 - All outputs are **HTML files** saved to `./documents/`
@@ -95,10 +99,11 @@ When building for a recognizable company (Discovery Education, Amazon, Google, e
 ## Phase Guides
 
 Load these as needed during each phase:
-- `prompts/Market Research Agent.md`
+- `prompts/Deep Research Agent.md`
 - `prompts/AI Framing Agent.md` (AI/ML products only)
 - `prompts/PRFAQ Guide.md`
 - `prompts/PRD Creation Guide.md`
+- `prompts/Prototype Spec Guide.md` (internal — used by agent during Prototype phase)
 - `prompts/Prototype Creation Guide.md`
 
 ## Sample Outputs

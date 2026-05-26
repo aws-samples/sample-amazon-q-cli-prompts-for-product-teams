@@ -6,6 +6,17 @@ inclusion: manual
 
 This steering file guides PRFAQ creation using Amazon's "Working Backwards" methodology. Include this when creating Press Release and FAQ documents.
 
+## Challenge Check (run BEFORE writing)
+
+Before writing the PRFAQ, critically examine research inputs:
+1. Is the pain point actually severe enough to build a product around, or are we overweighting vocal minorities?
+2. Are we cherry-picking research that confirms our hypothesis while ignoring disconfirming evidence?
+3. What's the strongest argument that this market doesn't actually want a new solution?
+4. Which competitor could ship this feature next quarter and make our product irrelevant?
+5. Are the TAM/SAM numbers realistic or aspirational? What would make them collapse?
+
+Your FAQ section MUST address the strongest counterarguments identified here. A PRFAQ with softball questions is a failed PRFAQ.
+
 ## Working Backwards Questions
 
 Before writing, answer these 5 questions:

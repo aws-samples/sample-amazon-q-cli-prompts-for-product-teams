@@ -9,7 +9,7 @@ This toolkit provides **steering files for [Kiro](https://kiro.dev)** that guide
 > **What is Kiro?** Kiro is an AI-powered IDE that uses "steering files" to guide AI behavior with project-specific instructions. Steering files are markdown documents in `.kiro/steering/` that provide context, workflows, and constraints. When you work in Kiro, these files automatically shape how the AI assistant responds - no manual prompting required.
 
 ```
-Discovery → Market Research → PRFAQ → PRD → Prototype
+Discovery → Deep Market Research → PRFAQ → PRD → Prototype
 ```
 
 Each phase produces professional deliverables as styled HTML documents that can be viewed in a browser and shared with stakeholders.
@@ -34,11 +34,12 @@ All outputs are **standalone HTML files** that open directly in any browser - no
 
 ## Workflow Phases
 
-### Phase 1: Market Research
-- Competitive landscape analysis (3-5 competitors)
+### Phase 1: Deep Market Research
+- 6 parallel research dimensions (Industry, Competitive, Customer, Technology, Innovation, Policy/Regulatory)
+- 120+ sources minimum with quality gates
 - Market sizing (TAM/SAM/SOM with sources)
 - Customer pain points research
-- Pricing intelligence
+- Technology radar mapped to AWS services
 - Customer brand research (logo, colors) if applicable
 
 **Output:** `MarketResearch_[Product]_[Date].html`
@@ -63,8 +64,10 @@ Implementation-ready specification:
 - User personas with detailed profiles
 - Requirements in EARS syntax (When/The/Shall format)
 - User stories with acceptance criteria
+- Current-year technology research (validated against latest AWS services)
+- Inline SVG architecture diagrams
 - Success metrics and business model
-- Technical constraints (AWS/Anthropic stack only)
+- Challenge Check stress-tests PRFAQ assumptions before writing
 
 **Output:** `PRD_[Product]_[Date].html` + `.kiro/specs/[product]/requirements.md`
 
@@ -72,15 +75,20 @@ Implementation-ready specification:
 Interactive HTML prototype with:
 - **Modular file structure** (not monolithic)
 - Distinctive visual design (no generic "AI slop")
+- Chart.js data visualizations (bundled locally, no CDN)
+- Realistic interaction patterns (state persists via localStorage, no toast-only responses)
 - Working navigation between screens
-- Form validation and feedback
+- Form validation with visible state changes
 - Responsive layouts (desktop, tablet, mobile)
+- Adversarial Bug Hunt pass (assumes bugs exist, finds and fixes them)
 - Realistic data (no Lorem ipsum)
 
 **Output:**
 ```
 documents/
-├── DesignSystem_[Product]_[Date].html    (shared CSS)
+├── lib/chart.min.js                      (bundled Chart.js — no CDN)
+├── [product-slug].css                    (shared design tokens)
+├── DesignSystem_[Product]_[Date].html    (visual reference)
 ├── ScreenIndex_[Product]_[Date].html     (navigation hub)
 ├── Screen_Dashboard_[Product]_[Date].html
 ├── Screen_[Name]_[Product]_[Date].html   (one per screen)
@@ -97,23 +105,26 @@ CLAUDE.md                       (auto-loads in Claude Code)
 ├── steering/
 │   ├── product-workflow.md     (main orchestration - always loaded)
 │   ├── design-standards.md     (visual standards - always loaded)
-│   ├── market-research.md      (research guide - manual)
+│   ├── market-research.md      (deep research guide - manual)
 │   ├── prfaq-guide.md          (PRFAQ guide - manual)
-│   ├── prd-guide.md            (PRD guide - manual)
+│   ├── prd-guide.md            (PRD guide + tech research - manual)
+│   ├── prototype-spec-guide.md (interaction spec - manual)
 │   └── prototype-guide.md      (prototype guide - manual)
 └── hooks.json                  (agent hooks for automation)
 
 prompts/                        (Claude Code / Cursor workflow)
 ├── Claude_Code_Workflow.md     (main workflow guide)
-├── Market Research Agent.md
+├── Deep Research Agent.md      (6 parallel dimensions, quality gates)
 ├── PRFAQ Guide.md
-├── PRD Creation Guide.md
+├── PRD Creation Guide.md       (includes Technology Research)
+├── Prototype Spec Guide.md     (interaction blueprint)
 └── Prototype Creation Guide.md
 
 documents/                      (auto-generated outputs)
-├── MarketResearch_*.html
+├── MarketResearch_*.html       (Deep Research output)
 ├── PRFAQ_*.html
 ├── PRD_*.html
+├── PrototypeSpec_*.html        (Interaction Spec)
 ├── DesignSystem_*.html
 ├── Screen_*.html
 └── ProjectDashboard_*.html
@@ -141,12 +152,12 @@ samples/                        (example outputs for reference)
 Pre-configured hooks in `.kiro/hooks.json` provide 26 PM-focused agents:
 
 **Automatic Validation (on file save):**
-- Market Research, PRFAQ, PRD, AI Framing validators
+- Deep Market Research, PRFAQ, PRD, AI Framing validators
 - Design System Consistency (prevents AI slop)
 - Tech Stack Validator (prefers AWS-native services)
 
 **Core Workflow (manual):**
-- Run Market Research → Create PRFAQ → Create PRD → Create Prototype
+- Run Deep Market Research → Create PRFAQ → Create PRD → Create Prototype
 
 **Research & Analysis:**
 - Customer Interview Simulator (roleplay as personas)
@@ -236,7 +247,8 @@ See `prompts/Claude_Code_Workflow.md` for the complete workflow guide.
 
 All documents are generated as **self-contained HTML files**:
 - No external dependencies beyond Google Fonts CDN
-- Open directly in any browser (`open documents/PRD_MyProduct_2025-01-06.html`)
+- Chart.js is bundled locally in `documents/lib/` (no CDN required)
+- Open directly in any browser (`open documents/PRD_MyProduct_2026-01-06.html`)
 - Print to PDF for offline sharing
 - Fully styled with professional formatting
 

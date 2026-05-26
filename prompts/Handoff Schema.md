@@ -25,7 +25,7 @@ All inter-agent communications use this envelope structure:
   "product_name_slug": "string (underscores, no spaces)",
 
   "source_agent": {
-    "agent_type": "orchestrator | market-research | prfaq | prd | prototype | ai-framing",
+    "agent_type": "orchestrator | market-research | prfaq | prd | prototype-spec | prototype | ai-framing",
     "phase_completed": "string",
     "execution_time_ms": "number"
   },
@@ -85,14 +85,14 @@ All inter-agent communications use this envelope structure:
     "context_files": ["paths to any CSV, company docs, etc."],
     "preferences": {
       "execution_mode": "full-approval | streamlined",
-      "research_depth": "quick | standard | comprehensive",
+      "research_depth": "standard | comprehensive",
       "brand_guidelines": "string (optional)"
     }
   }
 }
 ```
 
-### 2. Orchestrator → Market Research Agent
+### 2. Orchestrator → Deep Research Agent
 
 ```json
 {
@@ -104,7 +104,7 @@ All inter-agent communications use this envelope structure:
       "target_audience": "string",
       "industry_vertical": "string",
       "geographic_focus": "string | null",
-      "research_depth": "quick | standard | comprehensive"
+      "research_depth": "standard | comprehensive"
     },
     "specific_questions": [
       "string (optional specific research questions)"
@@ -113,7 +113,7 @@ All inter-agent communications use this envelope structure:
 }
 ```
 
-### 3. Market Research Agent → Orchestrator (for routing to PRFAQ)
+### 3. Deep Research Agent → Orchestrator (for routing to PRFAQ)
 
 ```json
 {
@@ -140,7 +140,7 @@ All inter-agent communications use this envelope structure:
       "recommended_pricing_position": "premium | mid-market | value | freemium",
       "key_risks": ["string"]
     },
-    "full_research_path": "documents/MarketResearch_[Product]_[Date].json"
+    "full_research_path": "documents/MarketResearch_[Product]_[Date].html"
   }
 }
 ```
@@ -188,7 +188,7 @@ All inter-agent communications use this envelope structure:
       "feasibility_assessment": "high | medium | low",
       "key_technical_risks": ["string"]
     },
-    "full_framing_path": "documents/AIFraming_[Product]_[Date].md"
+    "full_framing_path": "documents/AIFraming_[Product]_[Date].html"
   }
 }
 ```
@@ -243,7 +243,7 @@ All inter-agent communications use this envelope structure:
       "customer_experience": "string",
       "success_definition": "string"
     },
-    "full_prfaq_path": "documents/PRFAQ_[Product]_[Date].md"
+    "full_prfaq_path": "documents/PRFAQ_[Product]_[Date].html"
   }
 }
 ```
@@ -316,12 +316,122 @@ All inter-agent communications use this envelope structure:
       },
       "screens_identified": ["string"]
     },
-    "full_prd_path": "documents/PRD_[Product]_[Date].md"
+    "full_prd_path": "documents/PRD_[Product]_[Date].html"
   }
 }
 ```
 
-### 10. Orchestrator → Prototype Agent
+### 10. Orchestrator → Prototype Spec Agent
+
+```json
+{
+  "payload": {
+    "prd_context": {
+      "product_name": "string",
+      "product_overview": "string",
+      "personas": [
+        {
+          "name": "string",
+          "role": "string",
+          "primary_need": "string",
+          "key_workflow": "string",
+          "dashboard_widgets": ["string"]
+        }
+      ],
+      "core_requirements": [
+        {
+          "id": "REQ-001",
+          "requirement": "string",
+          "priority": "P0 | P1 | P2",
+          "persona": "string",
+          "acceptance_criteria": ["string"]
+        }
+      ],
+      "screens_identified": ["string"],
+      "user_flows": [
+        {
+          "flow_name": "string",
+          "steps": ["string"]
+        }
+      ]
+    },
+    "technology_context": {
+      "build_stack": [
+        {
+          "category": "string",
+          "recommendation": "string",
+          "version": "string",
+          "rationale": "string"
+        }
+      ],
+      "capability_enablers": [
+        {
+          "feature": "string",
+          "enabling_technology": "string",
+          "aws_service": "string | null"
+        }
+      ],
+      "year_validated": "number"
+    },
+    "design_context": {
+      "customer_company": "string | null",
+      "aesthetic_direction": "string | null",
+      "platform_targets": ["web", "mobile", "tablet"]
+    }
+  }
+}
+```
+
+### 11. Prototype Spec Agent → Orchestrator
+
+```json
+{
+  "payload": {
+    "prototype_spec_summary": {
+      "screen_manifest": [
+        {
+          "screen_name": "string",
+          "filename": "Screen_[Name]_[Product]_[Date].html",
+          "primary_persona": "string",
+          "entry_conditions": ["string"],
+          "exit_paths": [{"label": "string", "target_screen": "string"}],
+          "layout_zones": ["header", "sidebar", "content", "footer"],
+          "key_interactions": ["string"]
+        }
+      ],
+      "component_behaviors": [
+        {
+          "component": "string (e.g., data_table, form, modal, chat, notification)",
+          "screens_used_on": ["string"],
+          "behaviors": ["string"]
+        }
+      ],
+      "user_flows": [
+        {
+          "flow_name": "string",
+          "happy_path": ["string (Screen → action → Screen)"],
+          "edge_cases": ["string"],
+          "error_recovery": ["string"]
+        }
+      ],
+      "navigation_map": {
+        "primary_nav": ["string (screen names in nav order)"],
+        "utility_nav": ["string (settings, profile, etc.)"],
+        "conditional_access": [{"screen": "string", "condition": "string"}]
+      },
+      "state_inventory": [
+        {
+          "screen": "string",
+          "states": ["default", "empty", "loading", "error", "partial"]
+        }
+      ]
+    },
+    "full_spec_path": "documents/PrototypeSpec_[Product]_[Date].html"
+  }
+}
+```
+
+### 12. Orchestrator → Prototype Agent
 
 ```json
 {
@@ -348,6 +458,28 @@ All inter-agent communications use this envelope structure:
         }
       ]
     },
+    "prototype_spec_context": {
+      "screen_manifest": [
+        {
+          "screen_name": "string",
+          "filename": "string",
+          "entry_conditions": ["string"],
+          "exit_paths": [{"label": "string", "target_screen": "string"}],
+          "key_interactions": ["string"]
+        }
+      ],
+      "component_behaviors": [
+        {
+          "component": "string",
+          "behaviors": ["string"]
+        }
+      ],
+      "navigation_map": {
+        "primary_nav": ["string"],
+        "utility_nav": ["string"]
+      },
+      "full_spec_path": "string"
+    },
     "design_context": {
       "brand_guidelines": "string | null",
       "existing_design_system_path": "string | null",
@@ -371,7 +503,7 @@ All inter-agent communications use this envelope structure:
 }
 ```
 
-### 11. Prototype Agent → Orchestrator (Final)
+### 13. Prototype Agent → Orchestrator (Final)
 
 ```json
 {
@@ -433,16 +565,14 @@ documents/
 │   ├── handoff_[session-id]_[source]_to_[target]_[timestamp].json
 │   └── ...
 ├── [product-slug].css                                    (shared CSS — create FIRST)
-├── MarketResearch_[ProductSlug]_[YYYY-MM-DD].json
-├── AIFraming_[ProductSlug]_[YYYY-MM-DD].md
-├── AIFraming_[ProductSlug]_[YYYY-MM-DD].html
-├── PRFAQ_[ProductSlug]_[YYYY-MM-DD].md
+├── MarketResearch_[ProductSlug]_[YYYY-MM-DD].html        (Deep Research)
+├── AIFraming_[ProductSlug]_[YYYY-MM-DD].html             (AI/ML only)
 ├── PRFAQ_[ProductSlug]_[YYYY-MM-DD].html
-├── PRD_[ProductSlug]_[YYYY-MM-DD].md
 ├── PRD_[ProductSlug]_[YYYY-MM-DD].html
+├── PrototypeSpec_[ProductSlug]_[YYYY-MM-DD].html         (Interaction Spec)
 ├── DesignSystem_[ProductSlug]_[YYYY-MM-DD].html          (visual reference page)
-├── Prototype_[ProductSlug]_[YYYY-MM-DD].md
 ├── Screen_[ScreenName]_[ProductSlug]_[YYYY-MM-DD].html
+├── ScreenIndex_[ProductSlug]_[YYYY-MM-DD].html
 ├── ClickablePrototype_[ProductSlug]_[YYYY-MM-DD].html
 └── ProjectDashboard_[ProductSlug]_[YYYY-MM-DD].html
 ```

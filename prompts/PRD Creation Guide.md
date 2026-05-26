@@ -55,6 +55,16 @@ You must produce:
         "dashboard_widgets": ["string (e.g., 'Student progress charts', 'Admin user table')"]
       }
     ],
+    "user_stories": [
+      {
+        "id": "US-001",
+        "title": "string",
+        "persona": "string",
+        "story": "As a [persona], I want [capability] so that [benefit]",
+        "acceptance_criteria": ["string (EARS format)"],
+        "linked_requirements": ["REQ-001"]
+      }
+    ],
     "core_requirements": [
       {
         "id": "REQ-001",
@@ -88,6 +98,17 @@ You must produce:
 
 ## Execution Process
 
+### Challenge Check (run BEFORE writing — internal)
+
+Before analyzing inputs and writing the PRD, critically examine the PRFAQ and research:
+1. Would a skeptical VP with budget authority actually fund this? What would they push back on?
+2. What's the most likely way this product FAILS in market? (not a small setback — total failure)
+3. Is there a simpler version that validates the core hypothesis without the full feature set?
+4. What regulatory/political risk did we acknowledge but not actually mitigate in the solution?
+5. Are we solving the right problem for the right persona, or did we drift from the research?
+
+Use findings to identify requirements gaps, tighten acceptance criteria, and ensure the PRD addresses real objections rather than building on unexamined assumptions.
+
 ### Step 1: Analyze Input Context
 
 From the handoff payload, extract:
@@ -99,6 +120,80 @@ From the handoff payload, extract:
 - Market context → Business model and competitive positioning
 - AI context → ML requirements section (if applicable)
 - User context → Realistic personas using real names/roles
+- Technology radar → Feasible tech capabilities and AWS service mapping
+
+### Step 1.5: Technology Research (Current-Year Stack Assessment)
+
+**Purpose:** Ensure the PRD's technical recommendations reflect what is actually available in the current year, not stale assumptions from training data.
+
+**Protocol:**
+1. Determine the current year (from system date or context)
+2. For each major capability area identified in the product concept, run targeted web searches
+
+**Track A: Build Stack (what to build WITH)**
+
+Search for current-year availability and recommendations:
+- "[capability area] frameworks [current year]"
+- "[capability area] APIs services [current year]"
+- "AWS [service category] new features [current year]"
+- "best [technology category] [current year] comparison"
+- "[database/compute/auth category] AWS services [current year]"
+
+Document for each capability:
+- Frontend: current stable frameworks and their versions
+- Backend: runtimes, frameworks, serverless options
+- Database: AWS options (DynamoDB, Aurora, Neptune, etc.) with current capabilities
+- AI/ML: Amazon Bedrock models available NOW, AgentCore features, SageMaker capabilities
+- Infrastructure: Lambda, ECS, App Runner — which fit this specific use case
+- Authentication: Cognito features available in current year
+- Search/Analytics: OpenSearch, Kendra, QuickSight current capabilities
+
+**Track B: Product Capabilities (what tech ENABLES the product)**
+
+Search for what's possible to build today:
+- "generative AI capabilities [product domain] [current year]"
+- "[feature type] API services available [current year]"
+- "[product domain] technology capabilities [current year]"
+- "Amazon Bedrock models [current year] capabilities"
+- "[specific capability] implementation options [current year]"
+
+Document for each product feature:
+- What AI model capabilities exist to power it
+- What APIs/services could provide the data or functionality
+- What platform capabilities are newly available (browser APIs, mobile OS features)
+- Specific versions or releases that enable the feature
+
+**Quality Gate:** Every technology recommendation in the PRD must have a source link confirming it exists and is available in the current year. Do not recommend technologies based solely on training data assumptions.
+
+**Output:** Add to the PRD handoff payload:
+```json
+"technology_context": {
+  "build_stack": [
+    {
+      "category": "string (e.g., 'AI/ML', 'Database', 'Frontend')",
+      "recommendation": "string (e.g., 'Amazon Bedrock with Claude 4 Sonnet')",
+      "version": "string (e.g., 'claude-sonnet-4-6-20250514')",
+      "rationale": "string (why this choice for this product)",
+      "source_url": "string (documentation or announcement link)"
+    }
+  ],
+  "capability_enablers": [
+    {
+      "feature": "string (product feature this enables)",
+      "enabling_technology": "string (specific tech/API/service)",
+      "aws_service": "string | null (AWS service if applicable)",
+      "current_year_status": "string (GA, preview, beta)"
+    }
+  ],
+  "year_validated": "number (current year when research was conducted)"
+}
+```
+
+This technology context feeds into:
+- Section 5 (Technical Design) of the PRD
+- The "Technical Notes" fields of individual requirements
+- The Prototype Spec (for feasibility awareness)
+- The Prototype Agent (for realistic technical representation)
 
 ### Step 2: Create Personas
 
@@ -295,16 +390,63 @@ Compile full PRD with sections:
 4. **Product/Solution** (from PRFAQ, expanded)
 5. **Target Audience/Personas** (detailed)
 6. **Product Requirements** (prioritized, with acceptance criteria)
-7. **ML Requirements** (if AI/ML product)
-8. **MVP Scope** (included/excluded)
-9. **Timeline and Milestones** (phases)
-10. **Success Metrics** (KPIs with targets)
-11. **Business Model** (pricing, revenue)
-12. **Resourcing** (team needs)
-13. **Stakeholders** (from user context)
-14. **Prototype Requirements** (screens, flows)
-15. **Outstanding Questions** (unknowns, risks)
-16. **Appendices** (supporting materials)
+7. **Technical Architecture** (with inline SVG diagram — see below)
+8. **ML Requirements** (if AI/ML product)
+9. **MVP Scope** (included/excluded)
+10. **Timeline and Milestones** (phases)
+11. **Success Metrics** (KPIs with targets)
+12. **Business Model** (pricing, revenue)
+13. **Resourcing** (team needs)
+14. **Stakeholders** (from user context)
+15. **Prototype Requirements** (screens, flows)
+16. **Outstanding Questions** (unknowns, risks)
+17. **Appendices** (supporting materials)
+
+#### Technical Architecture Diagram (Inline SVG)
+
+Every PRD MUST include an inline SVG architecture diagram in the Technical Architecture section. This is not optional — it provides a visual system map at zero dependency cost.
+
+**When to include:** Any architecture with multiple AWS services communicating, data pipelines, or multi-tier deployments.
+
+**SVG requirements:**
+- Use `viewBox` for responsive scaling (never fixed pixel width on `<svg>`)
+- Style with CSS variables from the document's `<style>` block
+- Include `role="img"`, `<title>`, and `<desc>` for accessibility
+- Keep it simple: rounded-rect boxes with service names, directional arrows, grouping borders
+
+**Pattern:**
+```html
+<figure class="architecture-diagram">
+  <svg viewBox="0 0 800 400" role="img" style="width: 100%; max-width: 800px;">
+    <title>System Architecture — [Product Name]</title>
+    <desc>Shows data flow from API Gateway through Lambda to DynamoDB and Bedrock</desc>
+    <defs>
+      <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5"
+              markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--text-secondary)"/>
+      </marker>
+    </defs>
+    <!-- Service box -->
+    <rect x="50" y="170" width="160" height="60" rx="8"
+          fill="var(--surface-card)" stroke="var(--border-default)" stroke-width="1.5"/>
+    <text x="130" y="205" text-anchor="middle"
+          fill="var(--text-primary)" font-size="14" font-weight="600">API Gateway</text>
+    <!-- Arrow -->
+    <line x1="210" y1="200" x2="300" y2="200"
+          stroke="var(--text-secondary)" stroke-width="1.5" marker-end="url(#arrow)"/>
+    <!-- Next service box... -->
+  </svg>
+  <figcaption>Fig 1: High-level system architecture</figcaption>
+</figure>
+```
+
+**Style rules:**
+- Box fill: `var(--surface-card)` or a light tint of the brand color
+- Box stroke: `var(--border-default)`
+- Text: `var(--text-primary)` for service names, `var(--text-secondary)` for annotations
+- Arrows: `var(--text-secondary)` with arrowhead marker
+- Group borders (for "VPC" or "Subnet" groupings): dashed stroke, `var(--border-subtle)`
+- No inline hex colors — always use CSS variables
 
 ### Step 11: Save Artifacts
 
@@ -343,6 +485,9 @@ Generate structured JSON summary per Output Contract for the Orchestrator to pas
 Before completing, verify:
 - [ ] All PRFAQ elements translated to requirements
 - [ ] Personas are detailed and realistic
+- [ ] **User stories defined** (As a... I want... so that...) for each persona workflow
+- [ ] Each user story has EARS-format acceptance criteria
+- [ ] User stories map to personas (every persona has at least one story)
 - [ ] Requirements have clear acceptance criteria
 - [ ] MVP scope is clearly defined
 - [ ] Success metrics are measurable
@@ -350,7 +495,7 @@ Before completing, verify:
 - [ ] Screens list is comprehensive for prototype
 - [ ] ML requirements included (if AI/ML product)
 - [ ] All files saved correctly
-- [ ] Summary JSON is complete
+- [ ] Summary JSON is complete (includes user_stories array)
 
 ## What You Do NOT Do
 

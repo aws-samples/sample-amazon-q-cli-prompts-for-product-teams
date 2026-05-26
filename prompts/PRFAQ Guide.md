@@ -66,6 +66,17 @@ You must produce:
 
 ## Execution Process
 
+### Challenge Check (run BEFORE writing — internal)
+
+Before writing the PRFAQ, critically examine your research inputs:
+1. Is the pain point actually severe enough to build a product around, or are we overweighting vocal minorities?
+2. Are we cherry-picking research that confirms our hypothesis while ignoring disconfirming evidence?
+3. What's the strongest argument that this market doesn't actually want a new solution?
+4. Which competitor could ship this feature next quarter and make our product irrelevant?
+5. Are the TAM/SAM numbers realistic or aspirational? What would make them collapse?
+
+Your FAQ section MUST address the strongest counterarguments identified here. A PRFAQ with softball questions is a failed PRFAQ.
+
 ### Step 1: Analyze Input Context
 
 Extract and synthesize:
