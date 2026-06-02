@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "f=$(perl -ne 'print \"$1\" if /\"file_path\"\\s*:\\s*\"([^\"]+)\"/'); case \"$f\" in *Screen_*.html) perl -0777 -ne 'while(/<script\\b([^>]*)>(.*?)<\\/script>/gis){next if $1=~/\\bsrc\\s*=/i; next if $2=~/^\\s*$/; print $2,\"\\0\"}' \"$f\" | while IFS= read -r -d '' body; do printf '%s' \"$body\" > /tmp/__pmpm_hk.js; r=$(osascript -l JavaScript -e 'ObjC.import(\"Foundation\");var s=$.NSString.stringWithContentsOfFileEncodingError(\"/tmp/__pmpm_hk.js\",$.NSUTF8StringEncoding,null);try{new Function(s.js);\"OK\"}catch(e){\"FAIL: \"+e.message}'); [ \"$r\" != \"OK\" ] && echo \"SYNTAX GATE FAIL in $f: $r\"; done ;; *PRD_*.html) xmllint --noout \"$f\" 2>/tmp/__pmpm_hk.err || echo \"SVG/XML not well-formed in $f: $(head -1 /tmp/__pmpm_hk.err)\"; n=$(perl -0777 -pe 's{<defs\\b.*?</defs>}{}gis' \"$f\" | grep -coE '<(rect|circle|line|path|text|polygon|polyline|ellipse|image|use)\\b'); [ \"$n\" = \"0\" ] && echo \"SVG WARNING in $f: 0 shapes outside <defs> — diagram may be blank\" ;; esac; exit 0"
+          }
+        ]
+      }
+    ]
+  }
+}
