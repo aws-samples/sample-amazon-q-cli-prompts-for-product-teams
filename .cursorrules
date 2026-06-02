@@ -13,6 +13,15 @@ When the user describes a product idea or asks to start product development, fol
 4. **PRD** - Detailed requirements with EARS syntax
 5. **Prototype** - Interactive HTML with modular screens
 
+**Project Dashboard — update after EVERY phase (MANDATORY, do not skip):**
+Create `documents/ProjectDashboard_[Product]_[YYYY-MM-DD].html` at the START (all phases "pending"), then after each phase completes:
+1. Save the phase document
+2. **Regenerate the dashboard wholesale** from its `PHASES` array — set that phase's `status` to "completed" and fill its `doc`; re-emit the whole file (progress %, timestamp, links derive from the array). Never str-replace its structural HTML.
+3. `open ./documents/ProjectDashboard_[Product]_[YYYY-MM-DD].html`
+4. Tell the user: "Dashboard updated — [Phase] complete."
+
+Full protocol + template: `prompts/Claude_Code_Workflow.md` and `prompts/ProjectDashboard_Template.html`.
+
 **Key rules:**
 - All outputs are **HTML files** saved to `./documents/`
 - Use file naming: `[Type]_[Product]_[YYYY-MM-DD].html`
