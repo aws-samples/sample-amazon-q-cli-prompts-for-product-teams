@@ -163,8 +163,13 @@ For each phase, you will:
    - Include only essential context (see `Handoff Schema.md`)
    - Reference artifact paths, don't copy full content
 
-2. **Invoke Specialized Agent**
-   - Use the Task tool with appropriate subagent_type
+2. **Invoke Specialized Agent** (these are real subagents in `.claude/agents/`)
+   - Use the Task tool with the matching `subagent_type`:
+     - Deep Market Research → `deep-research`
+     - PRFAQ → `prfaq`
+     - PRD → `prd`
+     - Prototype → `design-system` first (shared CSS + Design Token Contract), then one `screen-builder` per screen (dispatched in parallel), then assemble the ScreenIndex
+     - Reviews / audits → `product-reviewer` (lens named in the prompt)
    - Pass the handoff payload in the prompt
    - Specify: "Output your results as structured JSON per Handoff Schema"
 

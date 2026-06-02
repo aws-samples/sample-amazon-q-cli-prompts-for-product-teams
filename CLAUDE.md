@@ -106,6 +106,13 @@ Load these as needed during each phase:
 - `prompts/Prototype Spec Guide.md` (internal — used by agent during Prototype phase)
 - `prompts/Prototype Creation Guide.md`
 
+## Native Claude Code Primitives
+
+This repo ships native Claude Code integration alongside the prose guides (single source of truth remains `prompts/*.md`):
+- **Subagents** (`.claude/agents/`): `deep-research`, `prfaq`, `prd`, `design-system`, `screen-builder` (parallel, one per screen), `product-reviewer`.
+- **Skills** (`.claude/skills/`): `product-research`, `product-prfaq`, `product-prd`, `product-prototype` — auto-load the relevant guide when that phase is active.
+- **Validation hooks** (`.claude/settings.json`): on Write/Edit of `Screen_*.html` the JS syntax gate runs; on `PRD_*.html` the SVG paint check runs. Advisory (never blocks), native tools only.
+
 ## Sample Outputs
 
 Reference `samples/` folder for quality standards (TeenFit example project).
