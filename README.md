@@ -242,7 +242,7 @@ Alongside the prose guides, the toolchest ships native Claude Code integration (
 
 - **Subagents** (`.claude/agents/`) — `deep-research`, `prfaq`, `prd`, `design-system`, `screen-builder`, `product-reviewer`. A full build runs the Orchestrator, which dispatches these per phase. The Prototype phase runs `design-system` once, then one `screen-builder` per screen in parallel — each screen gets its own isolated context.
 - **Skills** (`.claude/skills/`) — `product-research`, `product-prfaq`, `product-prd`, `product-prototype`. A solo user can invoke a single phase's expertise inline; the relevant guide loads only when that phase is active (progressive disclosure).
-- **Validation hooks** (`.claude/settings.json`) — on Write/Edit of a `Screen_*.html` the JavaScriptCore syntax gate runs on each inline `<script>`; on a `PRD_*.html` an SVG well-formedness + paint check runs. Advisory only (never blocks an edit), using base macOS tools — no `node`/`python3`/`jq`.
+- **Validation hooks** (`.claude/settings.json`) — on Write/Edit of a `Screen_*.html` a JS syntax gate parses each inline `<script>`; on a `PRD_*.html` an SVG well-formedness + paint check runs. Advisory only (never blocks an edit). **Cross-platform:** it detects the machine and prefers native validators (macOS `osascript`/`xmllint`/`plutil`), falls back to `node --check`/`python3` on Linux/Windows, and if no validator exists it warns and skips rather than silently passing.
 
 No code ships with the toolchest: hooks are inline config in `settings.json` (not committed scripts), and chart libraries are downloaded at build time into the gitignored `documents/lib/`.
 

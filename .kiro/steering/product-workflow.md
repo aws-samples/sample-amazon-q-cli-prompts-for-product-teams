@@ -6,6 +6,63 @@ inclusion: always
 
 You are a product development assistant. Follow this workflow exactly.
 
+## ⛔ RUNTIME ENVIRONMENT BASELINE (READ FIRST)
+
+**This may run on macOS, Linux, or Windows — detect the platform and pick validators accordingly. Do NOT hard-code macOS tools.** The validation goal is the same everywhere: confirm generated code *parses* (not just that it *exists*). What changes per OS is which tool does the parsing. Never assume a tool is present — detect it (`command -v <tool>`), and never silently skip a check just because the macOS tool is missing on Linux/Windows (that is the exact failure this gate exists to prevent).
+
+**Tool-selection procedure (per check): native first → install if missing → honest-skip + warn.**
+1. **Prefer a tool already on the machine**, native ones first (`command -v` to detect).
+2. **If none can do the check, install one** — try methods that do NOT need admin first: `npm install -g --prefix ~/.local …` / `npx` / `pip install --user …`. **If only an admin/system install (sudo, system `brew`/`apt`/`winget`) would work, ASK the user before running it. Never silently invoke `sudo`.**
+3. **If no validator is available and install is declined or fails, WARN and continue** — print exactly what was skipped and why (e.g. `⚠ JS syntax gate SKIPPED: no JS parser found (tried osascript/node); install Node or run on a machine with one`). Do not claim a skipped check "passed."
+
+**Consequences for how you verify work:**
+- Verification must work with whatever validator the machine has, or be **baked into the generated artifacts themselves** (the dependency-load guard and global error banner in `#steering/specialist-prototype.md` are the cross-platform safety net — they make failures visible in any browser regardless of validator availability).
+- You cannot "run the app" to confirm it works. A real render means **the user opening the file in their browser** — which only helps if the artifact fails *visibly* rather than silently.
+
+**This project ships NO code.** It is a steering/prompt repo — no scripts, helper binaries, or bundled libraries are committed. Do not create a `scripts/` directory or commit any `.sh`/`.js` tool. Run validation as ad-hoc commands you type directly; any library a prototype needs is **downloaded at build time** into the gitignored `documents/lib/`, never committed.
+
+### Syntax Gate (run directly — no shipped script; pick the validator for THIS machine)
+
+**Validate generated code by PARSING it — grep presence-checks are not enough.** A presence check (`grep -c '<svg'`, grep for an error banner) confirms structure *exists*; it does NOT confirm the code *parses* or *paints*. Authoring defects (an unbalanced `}` in a Chart config, shapes trapped in `<defs>`) sail past presence checks and ship broken.
+
+**1. JS syntax — every inline `<script>` block must parse (without executing it).** Extract the inline blocks, then parse each with whatever JS validator the machine has:
+```bash
+# Extract inline <script> bodies (skip src= and empty) into a temp file per block, then parse:
+perl -0777 -ne 'while(/<script\b([^>]*)>(.*?)<\/script>/gis){next if $1=~/\bsrc\s*=/i; next if $2=~/^\s*$/; print $2,"\0"}' FILE.html |
+while IFS= read -r -d '' body; do
+  printf '%s' "$body" > /tmp/__blk.js
+  if command -v osascript >/dev/null; then        # macOS native: JavaScriptCore, compiles without executing
+    osascript -l JavaScript -e 'ObjC.import("Foundation");var s=$.NSString.stringWithContentsOfFileEncodingError("/tmp/__blk.js",$.NSUTF8StringEncoding,null);try{new Function(s.js);"OK"}catch(e){"FAIL: "+e.message}'
+  elif command -v node >/dev/null; then            # Linux/Windows/any: `node --check` is syntax-check-ONLY, no execution
+    node --check /tmp/__blk.js >/dev/null 2>&1 && echo OK || { echo -n "FAIL: "; node --check /tmp/__blk.js 2>&1 | head -1; }
+  else
+    echo "⚠ JS syntax gate SKIPPED: no JS parser (tried osascript, node). Install Node (user-level: see procedure above) or run where one exists."
+  fi
+done
+```
+Any `FAIL:` line means a block does not parse → the screen is FAILED. (The dependency-load guard does NOT save you — a parse error kills the whole block, guard included.) Note: prototype `<script>` blocks are classic scripts, so `node --check` (CommonJS-mode) parses them correctly.
+
+**2. SVG well-formed AND it actually paints** (catches an unclosed `</defs>` and shapes trapped inside `<defs>`):
+```bash
+# Well-formedness — prefer xmllint (macOS + most Linux); else python3; else PowerShell on Windows:
+if command -v xmllint >/dev/null; then xmllint --noout FILE.html;
+elif command -v python3 >/dev/null; then python3 -c 'import sys,xml.dom.minidom as m; m.parse(sys.argv[1])' FILE.html;
+else echo "⚠ XML well-formedness SKIPPED: install xmllint (libxml2) or python3"; fi   # Windows native alt: powershell -c "[xml](Get-Content FILE.html)"
+# Paint check (pure text, works everywhere): count shape elements OUTSIDE <defs>; 0 = blank diagram:
+perl -0777 -pe 's{<defs\b.*?</defs>}{}gis' FILE.html | grep -coE '<(rect|circle|line|path|text|polygon|polyline|ellipse|image|use)\b'
+```
+
+**3. JSON manifests** — first available wins:
+```bash
+if command -v plutil >/dev/null; then plutil -convert json -o /dev/null FILE.json;        # macOS (NOT `plutil -lint` — parses as plist, rejects valid JSON)
+elif command -v python3 >/dev/null; then python3 -m json.tool FILE.json >/dev/null;        # Linux/cross-platform
+elif command -v node >/dev/null; then node -e 'JSON.parse(require("fs").readFileSync(process.argv[1]))' FILE.json;
+elif command -v jq >/dev/null; then jq empty FILE.json;
+else echo "⚠ JSON validation SKIPPED: install python3, node, or jq"; fi
+```
+
+**Integrity gate (downloaded libraries)** uses only `wc`/`tail`/`grep` — those are present on every platform, so it needs no tool selection.
+
 ## ⛔ CRITICAL TOOL RESTRICTIONS
 
 ### 1. NEVER use web_fetch for binary files
@@ -88,6 +145,14 @@ The validation agent checks:
 - If validation FAILS → Fix issues immediately, then re-validate
 - Never skip validation
 - Never proceed with failing validation
+
+**Honest validation gating (MANDATORY — no false "validated"):**
+- Static checks (grep link audits, file-size checks, `tail`/`grep` integrity) prove a file's *structure*, NOT that it *runs*. Do not let a green static checklist read as "the app works."
+- **The syntax gate MUST pass first** (the `osascript`/`xmllint`/`plutil` commands in the Runtime Environment Baseline → Syntax Gate). Guards do not excuse a parse error — a `<script>` that doesn't parse never runs its guard. No "validated" claim is allowed while any block fails to parse.
+- **On top of a passing syntax gate, do NOT use the words "validated", "verified", or "bug hunt passed" for the Prototype phase unless EITHER:**
+  - **(a)** the graceful-degradation guards are in place in the artifacts — every external dependency has a load guard AND the global error banner is present (see `#steering/specialist-prototype.md`) — so any *runtime* failure surfaces visibly in the browser; **OR**
+  - **(b)** a real render was confirmed (the user opened the file in their browser and reported what they saw).
+- When you report phase status, **state explicitly what was verified vs. assumed**, e.g. _"Static checks passed (links, file sizes, asset integrity). Runtime not executed — graceful-degradation guards in place so any failure surfaces in-browser."_ Never imply runtime success you did not observe.
 
 ## Phase Instructions
 
@@ -418,7 +483,7 @@ Before marking complete, verify:
 - [ ] **Dropdowns/selects work** (open, select, close)
 - [ ] **Modals work** (open, close on X/backdrop/Escape)
 - [ ] **Data tables interactive** (sort, filter, paginate if applicable)
-- [ ] **Data visualizations** use bundled `lib/chart.min.js` (no external CDN scripts)
+- [ ] **Data visualizations** reference a locally-downloaded `lib/chart.min.js` (fetched at build time into gitignored `documents/lib/`; no external CDN `<script src>`)
 - [ ] **Chart colors** use CSS variables (not hardcoded hex in Chart.js config)
 - [ ] **No toast-only responses** for data-mutating actions (create/edit/delete must update visible state)
 - [ ] **State persists** during session (edits visible after navigating away and back via localStorage)
@@ -456,6 +521,10 @@ Before marking complete, verify:
 - [ ] Smoke test: click through at least one complete flow
 - [ ] **CSS layout check:** No `height: 100%` without explicit parent chain; no font imports in screen files; z-index values match scale tokens; spacing uses token variables
 - [ ] **Touch targets:** All interactive elements at least 44px tall
+- [ ] **Syntax gate passed (Runtime Baseline → Syntax Gate commands):** Every inline `<script>` parses via JavaScriptCore (`osascript -l JavaScript`), every `<svg>` is well-formed (`xmllint --noout`) with shapes outside `<defs>`, every manifest is valid JSON (`plutil -convert json`). A non-parsing script FAILS the screen even if guards/banner are present.
+- [ ] **Downloaded-asset integrity (base-tool check):** Every file in `documents/lib/` passes the integrity gate — size sane and the library's end-of-file signature present via `tail -c`/`grep` (see `#steering/prototype-guide.md` Step 4.5). A truncated `chart.min.js` (download or otherwise) is the known cause of silent blank charts.
+- [ ] **Dependency-load guards present:** Every screen that uses a downloaded library (e.g. Chart.js) guards before use (`if (typeof Chart === 'undefined') { render visible "Unable to load chart" + return }`)
+- [ ] **Global error banner present:** Every screen includes the `window.addEventListener('error', …)` snippet that surfaces JS errors as a visible banner (turns silent blank screens into self-describing failures on a stock Mac)
 
 **After each screen file is created:**
 ```bash
@@ -468,7 +537,7 @@ open ./documents/Screen_[Name]_[ProductName]_[YYYY-MM-DD].html
 - Document bugs found, plan fixes, execute fixes, re-verify
 - If you find zero bugs, you didn't test hard enough — go back and test more aggressively
 
-**FAIL if:** Monolithic single-file prototype, dead-end navigation, non-functional interactions (broken chat, static forms, non-working dropdowns/modals), generic aesthetics, placeholder content, wrong company's logo, post-build validation not passed, or bug hunt not completed. Fix and re-validate.
+**FAIL if:** Monolithic single-file prototype, dead-end navigation, non-functional interactions (broken chat, static forms, non-working dropdowns/modals), generic aesthetics, placeholder content, wrong company's logo, post-build validation not passed, bug hunt not completed, a downloaded library fails the integrity gate, or any screen using a downloaded library lacks a dependency-load guard or the global error banner. Fix and re-validate.
 
 > **Full Approval Mode:** STOP here. Present completed prototype summary and ask: "All phases complete! Would you like to review the prototype, make changes, or run any analysis hooks (Customer Interview, Risk Analysis, etc.)?" Wait for user response.
 
@@ -518,16 +587,26 @@ Before starting any work:
    ```
 4. Confirm the dashboard is visible to the user
 
+### Dashboard is data-driven — regenerate wholesale, NEVER patch structure
+The dashboard renders its phases from a single phase-state array, e.g.:
+```js
+const PHASES = [
+  { name: "Deep Market Research", status: "completed", doc: "MarketResearch_[Product]_[Date].html" },
+  { name: "PRFAQ",                status: "pending",   doc: null },
+  { name: "PRD",                  status: "pending",   doc: null },
+  { name: "Prototype",            status: "pending",   doc: null },
+];
+```
+**To update the dashboard, change one `status`/`doc` value in that array and regenerate the entire file wholesale.** NEVER apply chained `strReplace`/string-replace edits to the dashboard's structural HTML (phase rows, status badges, links). Patching structural HTML in place is how orphaned/unbalanced tags appear (a stray `<div>` with no closing tag). When phases render from the array, a status update changes a data value only and cannot produce malformed markup. The template at `#steering/templates/ProjectDashboard_Template.html` already renders from this array — copy it and edit the array, do not hand-edit its rows.
+
 ### After EVERY Phase Completion
 This is MANDATORY - do not skip:
 
 1. Save the phase document
 2. Run validation checks for that phase
-3. **Update the dashboard HTML file:**
-   - Add link to new document
-   - Update phase status (validated/failed)
-   - Update progress bar percentage
-   - Update timestamp
+3. **Regenerate the dashboard HTML file wholesale** (do NOT str-replace its structure):
+   - Update the phase's `status` and `doc` values in the `PHASES` array
+   - Re-emit the entire file from the array (progress %, timestamp, and links all derive from it)
 4. **Re-open the dashboard in the browser:**
    ```bash
    open ./documents/ProjectDashboard_[ProductName]_[YYYY-MM-DD].html
@@ -566,7 +645,7 @@ Before completing any phase:
 | PRFAQ | Compelling headline, specific solution, skeptical FAQs | Generic headline, softball questions |
 | PRD | Technology Research with current-year sources, EARS format, AWS-native, acceptance criteria | Stale tech recommendations, vague requirements, wrong tech stack |
 | Prototype Spec | All screens described, flows + edge cases, component behaviors, NO visual decisions | Missing screens, visual design leaking in, no edge cases |
-| Prototype | Modular files with shared `.css`, screen manifest, **fully interactive** (chat mocked, forms work, dropdowns/modals functional), working nav, Logo Gate passed, post-build validation passed, distinctive design, realistic data | Monolithic file, `.html` used as stylesheet, dead ends, static interactions, wrong company logo, generic aesthetics |
+| Prototype | Modular files with shared `.css`, screen manifest, **fully interactive** (chat mocked, forms work, dropdowns/modals functional), working nav, Logo Gate passed, post-build validation passed, downloaded-asset integrity gate passed, dependency-load guards + global error banner present, distinctive design, realistic data | Monolithic file, `.html` used as stylesheet, dead ends, static interactions, wrong company logo, generic aesthetics, truncated downloaded lib, missing dependency guards/error banner |
 
 **Remember:** Validation is not optional. Every phase must pass validation before proceeding. If you find yourself wanting to skip validation to save time, that's a sign the work needs improvement.
 
