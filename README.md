@@ -75,24 +75,25 @@ Implementation-ready specification:
 Interactive HTML prototype with:
 - **Modular file structure** (not monolithic)
 - Distinctive visual design (no generic "AI slop")
-- Chart.js data visualizations (bundled locally, no CDN)
+- Chart.js data visualizations (downloaded to `documents/lib/` at build time, referenced locally — never a CDN script)
+- Dependency-load guard + global error banner on every screen (failures surface visibly instead of a blank page)
 - Realistic interaction patterns (state persists via localStorage, no toast-only responses)
 - Working navigation between screens
 - Form validation with visible state changes
 - Responsive layouts (desktop, tablet, mobile)
-- Adversarial Bug Hunt pass (assumes bugs exist, finds and fixes them)
+- Syntax gate + adversarial Bug Hunt pass (parses every inline `<script>`; assumes bugs exist, finds and fixes them)
 - Realistic data (no Lorem ipsum)
 
 **Output:**
 ```
 documents/
-├── lib/chart.min.js                      (bundled Chart.js — no CDN)
+├── lib/chart.min.js                      (Chart.js — downloaded at build time, gitignored, not committed)
 ├── [product-slug].css                    (shared design tokens)
 ├── DesignSystem_[Product]_[Date].html    (visual reference)
 ├── ScreenIndex_[Product]_[Date].html     (navigation hub)
 ├── Screen_Dashboard_[Product]_[Date].html
 ├── Screen_[Name]_[Product]_[Date].html   (one per screen)
-└── ProjectDashboard_[Product]_[Date].html
+└── ProjectDashboard_[Product]_[Date].html  (live status — regenerated after every phase)
 ```
 
 ## File Structure
@@ -101,7 +102,7 @@ documents/
 CLAUDE.md                       (auto-loads in Claude Code)
 .cursorrules                    (auto-loads in Cursor)
 
-.kiro/
+.kiro/                          (Kiro mode)
 ├── steering/
 │   ├── product-workflow.md     (main orchestration - always loaded)
 │   ├── design-standards.md     (visual standards - always loaded)
@@ -109,25 +110,38 @@ CLAUDE.md                       (auto-loads in Claude Code)
 │   ├── prfaq-guide.md          (PRFAQ guide - manual)
 │   ├── prd-guide.md            (PRD guide + tech research - manual)
 │   ├── prototype-spec-guide.md (interaction spec - manual)
-│   └── prototype-guide.md      (prototype guide - manual)
-└── hooks.json                  (agent hooks for automation)
+│   ├── prototype-guide.md      (prototype guide - manual)
+│   ├── specialist-*.md         (per-phase specialists - fileMatch, auto-injected when editing the matching output)
+│   └── templates/              (ScreenIndex + ProjectDashboard templates)
+└── hooks.json                  (16 agent hooks: validators, phase transitions, analysis lenses)
 
-prompts/                        (Claude Code / Cursor workflow)
+prompts/                        (Claude Code / Cursor workflow — single source of truth for both modes)
 ├── Claude_Code_Workflow.md     (main workflow guide)
+├── Orchestrator.md             (coordination + per-phase agent dispatch)
+├── Shared Standards.md         (runtime baseline, syntax gate, file naming, budgets)
 ├── Deep Research Agent.md      (6 parallel dimensions, quality gates)
+├── AI Framing Agent.md         (AI/ML products only)
 ├── PRFAQ Guide.md
 ├── PRD Creation Guide.md       (includes Technology Research)
 ├── Prototype Spec Guide.md     (interaction blueprint)
-└── Prototype Creation Guide.md
+├── Prototype Creation Guide.md
+├── Handoff Schema.md           (inter-phase payload contract)
+└── ProjectDashboard_Template.html / ScreenIndex_Template.html
 
-documents/                      (auto-generated outputs)
+.claude/                        (native Claude Code layer — thin shims over prompts/)
+├── agents/                     (6 subagents: deep-research, prfaq, prd, design-system, screen-builder, product-reviewer)
+├── skills/                     (4 phase skills: product-research/prfaq/prd/prototype)
+└── settings.json               (advisory PostToolUse validation hooks — cross-platform, never blocks)
+
+documents/                      (auto-generated outputs — gitignored)
+├── lib/chart.min.js            (downloaded at build time, not committed)
 ├── MarketResearch_*.html       (Deep Research output)
 ├── PRFAQ_*.html
 ├── PRD_*.html
 ├── PrototypeSpec_*.html        (Interaction Spec)
 ├── DesignSystem_*.html
 ├── Screen_*.html
-└── ProjectDashboard_*.html
+└── ProjectDashboard_*.html     (live status, regenerated after every phase)
 
 samples/                        (example outputs for reference)
 ├── DesignSystem_TeenFit.html
@@ -140,47 +154,35 @@ samples/                        (example outputs for reference)
 
 | File | Inclusion | Purpose |
 |------|-----------|---------|
-| `product-workflow.md` | always | Main workflow orchestration |
+| `product-workflow.md` | always | Main workflow orchestration (incl. runtime baseline, syntax gate, dashboard protocol) |
 | `design-standards.md` | always | Visual design standards |
 | `market-research.md` | manual | Web-based research guide |
 | `prfaq-guide.md` | manual | PRFAQ creation guide |
 | `prd-guide.md` | manual | PRD and Kiro spec guide |
+| `prototype-spec-guide.md` | manual | Interaction blueprint guide |
 | `prototype-guide.md` | manual | Prototype creation guide |
+| `specialist-*.md` | fileMatch | Per-phase specialist prompts, auto-injected when editing the matching output (e.g. `specialist-prototype.md` activates on `Screen_*.html`) |
 
 ## Agent Hooks
 
-Pre-configured hooks in `.kiro/hooks.json` provide 26 PM-focused agents:
+`.kiro/hooks.json` defines **16 hooks** in three groups:
 
-**Automatic Validation (on file save):**
-- Deep Market Research, PRFAQ, PRD, AI Framing validators
-- Design System Consistency (prevents AI slop)
-- Tech Stack Validator (prefers AWS-native services)
+**Automatic validators (trigger on file save):**
+- Market Research Validator, PRFAQ Validator, PRD Validator, Design System Validator, Screen Validator
+- Kiro Spec Validator (EARS syntax), Tech Stack Validator (prefers AWS-native services)
 
-**Core Workflow (manual):**
-- Run Deep Market Research → Create PRFAQ → Create PRD → Create Prototype
+**Automatic phase transitions (on file save):**
+- Market Research → PRFAQ, PRFAQ → PRD, PRD → Prototype (prompt to continue to the next phase)
 
-**Research & Analysis:**
+**Manual analysis lenses (run on demand):**
 - Customer Interview Simulator (roleplay as personas)
 - Competitive Response Analyzer
-- User Journey Mapper
 - Risk Analyzer
-- Competitor Feature Matrix
-
-**Strategy:**
 - Feature Prioritizer (RICE)
-- A/B Test Hypothesis Generator
-
-**Prototype & UX:**
-- Microcopy Writer
-- Onboarding Flow Designer
 - Accessibility Auditor (WCAG)
+- Interactivity & Link Checker
 
-**Team & Communication:**
-- Stakeholder Update Generator
-- Demo Script Writer
-- Meeting Notes to Requirements
-
-See `.kiro/hooks.json` for the full hook configuration.
+See `.kiro/hooks.json` for the full hook configuration. (Claude Code mode has its own equivalents — see *Native Claude Code primitives* below.)
 
 ## Design Standards
 
@@ -257,9 +259,9 @@ See `prompts/Claude_Code_Workflow.md` for the complete workflow guide.
 ## Output Format
 
 All documents are generated as **self-contained HTML files**:
-- No external dependencies beyond Google Fonts CDN
-- Chart.js is bundled locally in `documents/lib/` (no CDN required)
-- Open directly in any browser (`open documents/PRD_MyProduct_2026-01-06.html`)
+- **No CDN-loaded scripts/libraries** — executable code is hand-written inline or downloaded locally. Chart.js is fetched into `documents/lib/` at build time (then integrity-checked), never loaded from a CDN at view time.
+- Google Fonts CSS via CDN is the one sanctioned external reference (styling only, degrades to system fonts offline)
+- Open directly in any browser (`open documents/PRD_MyProduct_2026-06-03.html`)
 - Print to PDF for offline sharing
 - Fully styled with professional formatting
 

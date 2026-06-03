@@ -15,7 +15,9 @@ This document contains standards and conventions that ALL specialized agents mus
 
 **This project ships NO code.** It is a steering/prompt repo — no scripts, no helper binaries, no bundled libraries are committed. Do not create a `scripts/` directory or commit any `.sh`/`.js` tool. Run validation as ad-hoc commands you type directly (below). Any library a prototype needs is **downloaded at build time** into the gitignored `documents/lib/`, never committed (see `Prototype Creation Guide.md` → Data Visualization).
 
-**Serve locally → no CDNs, ever.** Prototypes are opened from the local filesystem. All scripting must be either hand-written inline or downloaded into `documents/lib/` at build time and referenced locally. Never reference a CDN `<script src>` / `<link href>` — it won't load offline and contradicts the local-serving model.
+**Serve locally → no CDN-loaded scripts/libraries.** Prototypes are opened from the local filesystem, so **executable code must never come from a CDN**: all JavaScript must be hand-written inline or downloaded into `documents/lib/` at build time and referenced locally. Never reference a CDN `<script src>` for a library (e.g. Chart.js) — it won't load offline and is a remote-code dependency.
+
+**Exception — Google Fonts CSS is allowed via CDN.** `@import url('https://fonts.googleapis.com/...')` / `<link href="https://fonts.googleapis.com/...">` (in the shared CSS only) is the one sanctioned CDN reference: it loads styling, not executable code, and degrades gracefully to system fonts if offline. The rule is about **script execution**, not all network requests.
 
 **What this means for verification:**
 - Every validation step must run with whatever validator the machine has, OR be **baked into the generated artifacts** (dependency-load guards + a global error banner — see `Prototype Creation Guide.md`; these are the cross-platform safety net, surfacing failures in any browser regardless of validator availability).
@@ -108,7 +110,7 @@ This repo ships no libraries. When a prototype needs one, download it into the g
 | Chart.js 4.x | `curl -sL -o documents/lib/chart.min.js "https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"` | `<script src="lib/chart.min.js"></script>` |
 
 **Rules for local libraries:**
-- The `curl` above is a one-time *build-time download* into a local file — screens NEVER reference a CDN URL. All scripting must work offline from the filesystem at view time (see Runtime Environment Baseline → "Serve locally → no CDNs, ever").
+- The `curl` above is a one-time *build-time download* into a local file — screens NEVER reference a CDN URL for a script/library. All executable code must work offline from the filesystem at view time (see Runtime Environment Baseline → "Serve locally → no CDN-loaded scripts/libraries"). Google Fonts CSS via CDN is the one allowed exception.
 - Always reference via relative path from `documents/` (screens are siblings of `lib/`)
 - After downloading, verify integrity (size + end-of-file signature) before relying on it — a download can truncate
 - Chart colors MUST use CSS variables (extracted via `getComputedStyle`) — never hardcoded hex
