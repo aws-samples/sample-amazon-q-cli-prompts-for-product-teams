@@ -499,6 +499,7 @@ Before building any screens, commit to a **bold, intentional aesthetic direction
 - Break grids intentionally—asymmetry, overlap, diagonal flow
 - Customize every component to match your aesthetic
 - Create visual hierarchy through bold contrast
+- **Icons:** prefer hand-authored inline `<svg>` (offline-safe, fully styleable). An icon-font CDN (Font Awesome, Material Symbols) is an acceptable fallback only — see `Shared Standards.md` → Runtime Environment Baseline for the CDN rule (style resources OK; never a CDN `<script>`).
 
 ### Step 3: Map User Flows
 

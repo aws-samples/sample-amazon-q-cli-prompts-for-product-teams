@@ -15,9 +15,13 @@ This document contains standards and conventions that ALL specialized agents mus
 
 **This project ships NO code.** It is a steering/prompt repo — no scripts, no helper binaries, no bundled libraries are committed. Do not create a `scripts/` directory or commit any `.sh`/`.js` tool. Run validation as ad-hoc commands you type directly (below). Any library a prototype needs is **downloaded at build time** into the gitignored `documents/lib/`, never committed (see `Prototype Creation Guide.md` → Data Visualization).
 
-**Serve locally → no CDN-loaded scripts/libraries.** Prototypes are opened from the local filesystem, so **executable code must never come from a CDN**: all JavaScript must be hand-written inline or downloaded into `documents/lib/` at build time and referenced locally. Never reference a CDN `<script src>` for a library (e.g. Chart.js) — it won't load offline and is a remote-code dependency.
+**Serve locally → the rule is about REMOTE EXECUTABLE CODE, not all network requests.** Prototypes open from the local filesystem, so the line is:
 
-**Exception — Google Fonts CSS is allowed via CDN.** `@import url('https://fonts.googleapis.com/...')` / `<link href="https://fonts.googleapis.com/...">` (in the shared CSS only) is the one sanctioned CDN reference: it loads styling, not executable code, and degrades gracefully to system fonts if offline. The rule is about **script execution**, not all network requests.
+- **BLOCK remote executable code.** Never reference a CDN `<script src>` for a JS library (Chart.js, etc.) — it's a remote-code dependency that fails offline. Download libraries at build time into `documents/lib/` and reference them locally; or hand-write the JS inline.
+- **ALLOW non-executing style resources that degrade gracefully offline.** A CDN reference for *styling* is fine when it (a) executes no JavaScript and (b) falls back sensibly if it doesn't load. This covers Google Fonts CSS **and** its font files (`fonts.googleapis.com` for the CSS, `fonts.gstatic.com` for the woff2) — both belong in the shared CSS only, and degrade to system fonts offline. The same logic extends to an icon-font CDN (e.g. Font Awesome / Material Symbols): allowed as a fallback, since it's CSS + a font with no code execution.
+- **Icons — prefer inline SVG.** Default to hand-authored inline `<svg>` icons: fully offline-safe, fully styleable, no slop. Reach for an icon-font CDN only as a fallback when inline SVG is impractical (it falls under the style-resource allowance above).
+
+Note: a `w3.org` URL in an SVG (`xmlns="http://www.w3.org/2000/svg"`) is a **namespace identifier, not a network fetch** — nothing downloads it. Never flag, rewrite, or "localize" it.
 
 **What this means for verification:**
 - Every validation step must run with whatever validator the machine has, OR be **baked into the generated artifacts** (dependency-load guards + a global error banner — see `Prototype Creation Guide.md`; these are the cross-platform safety net, surfacing failures in any browser regardless of validator availability).
@@ -110,7 +114,7 @@ This repo ships no libraries. When a prototype needs one, download it into the g
 | Chart.js 4.x | `curl -sL -o documents/lib/chart.min.js "https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"` | `<script src="lib/chart.min.js"></script>` |
 
 **Rules for local libraries:**
-- The `curl` above is a one-time *build-time download* into a local file — screens NEVER reference a CDN URL for a script/library. All executable code must work offline from the filesystem at view time (see Runtime Environment Baseline → "Serve locally → no CDN-loaded scripts/libraries"). Google Fonts CSS via CDN is the one allowed exception.
+- The `curl` above is a one-time *build-time download* into a local file — screens NEVER reference a CDN URL for a script/library. All executable code must work offline from the filesystem at view time (see Runtime Environment Baseline → "Serve locally → the rule is about REMOTE EXECUTABLE CODE"). Non-executing style resources that degrade offline (Google Fonts CSS + its font files; an icon-font CDN as fallback) are allowed under that principle.
 - Always reference via relative path from `documents/` (screens are siblings of `lib/`)
 - After downloading, verify integrity (size + end-of-file signature) before relying on it — a download can truncate
 - Chart colors MUST use CSS variables (extracted via `getComputedStyle`) — never hardcoded hex

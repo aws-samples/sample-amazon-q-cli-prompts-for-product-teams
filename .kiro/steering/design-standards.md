@@ -19,6 +19,8 @@ Create **distinctive, production-grade interfaces** that avoid generic "AI slop"
 - Flat solid backgrounds without texture
 - Excessive emojis: Only use emojis when essential to the design tone (e.g., playful apps for younger audiences). For most products, use icons or typography instead.
 
+**Icons:** Prefer hand-authored inline `<svg>` — offline-safe, fully styleable, no slop. An icon-font CDN (Font Awesome, Material Symbols) is an acceptable fallback only: it's CSS + a font with no JS execution, so it's allowed under the same rule as Google Fonts (see `prompts/Shared Standards.md` → Runtime Environment Baseline). Never load icons via a CDN `<script>`.
+
 ## Aesthetic Directions
 
 Choose ONE direction based on product type:
