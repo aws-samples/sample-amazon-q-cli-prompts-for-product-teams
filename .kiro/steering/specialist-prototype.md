@@ -145,6 +145,39 @@ For screens with charts, graphs, or data visualizations:
 - **Container sizing:** Explicit height required (`height: 300px` on wrapper div). Set `responsive: true` and `maintainAspectRatio: false` in Chart.js options
 - **Realistic data only** — use plausible numbers for the product domain
 - **States:** Include loading skeleton, empty state ("No data yet"), and error state ("Unable to load") where applicable
+- **MANDATORY dependency-load guard:** Guard before using the library. A truncated/missing `chart.min.js` must show a visible error, NOT a blank card (no devtools to diagnose on a stock Mac):
+  ```html
+  <script src="lib/chart.min.js"></script>
+  <script>
+    if (typeof Chart === 'undefined') {
+      document.querySelectorAll('.chart-container').forEach(el => {
+        el.innerHTML = '<div class="chart-error" role="alert">⚠ Unable to load chart library</div>';
+      });
+    } else {
+      // build charts here
+    }
+  </script>
+  ```
+  - **What this guard does NOT cover:** It catches a *missing or truncated library* only. It does NOT protect against a *syntax error in your own script* — a parse error (e.g. an unbalanced `}` in the `new Chart({…})` config) makes the ENTIRE `<script>` block fail to parse, so the guard above never runs either. Defend against that separately: write **multi-line, readable Chart.js configs** (never compress a deeply-nested options object onto one line where a missing brace is invisible), and run the syntax gate (the `osascript -l JavaScript` one-liner in `#steering/product-workflow.md` → Runtime Environment Baseline → Syntax Gate) so JavaScriptCore catches the parse error before delivery.
+
+## Fail Visibly: Global Error Banner (REQUIRED on every screen)
+
+On a stock Mac without admin, there is no devtools workflow to diagnose a blank screen — failures must be self-describing in the browser the user already has open. Add this snippet to **every** screen so any uncaught script error becomes a visible banner instead of a silent blank page:
+
+```html
+<script>
+  window.addEventListener('error', e => {
+    let b = document.getElementById('__err_banner');
+    if (!b) {
+      b = document.createElement('div');
+      b.id = '__err_banner';
+      b.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:99999;background:#b00020;color:#fff;padding:10px 16px;font:14px/1.4 sans-serif;';
+      document.body.appendChild(b);
+    }
+    b.textContent = '⚠ Script error: ' + e.message;
+  });
+</script>
+```
 
 ## File Structure (CRITICAL)
 
