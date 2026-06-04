@@ -414,27 +414,63 @@ Every PRD MUST include an inline SVG architecture diagram in the Technical Archi
 - Include `role="img"`, `<title>`, and `<desc>` for accessibility
 - Keep it simple: rounded-rect boxes with service names, directional arrows, grouping borders
 
-**Pattern:**
+**Alignment system (MANDATORY — this is why arrows usually look misaligned).** Do NOT freehand box positions and then eyeball each arrow endpoint — that arithmetic drifts and arrows miss box edges/centers. Instead, derive everything from a fixed grid + edge-anchor formulas:
+
+1. **Snap boxes to a grid.** Pick constants and reuse them: box width `W` and height `H` (e.g. 150×56), a column pitch and row pitch (e.g. columns at x = 40, 240, 440…; rows at y = 60, 160, 260…). Every box's `x`/`y` is a grid coordinate — never an arbitrary number.
+2. **Compute anchor points, never guess them.** For a box at `(x, y)`:
+   - right-edge center = `(x+W, y+H/2)` · left-edge center = `(x, y+H/2)`
+   - bottom center = `(x+W/2, y+H)` · top center = `(x+W/2, y)`
+   Put each box's anchors in a comment so endpoints are copy-paste, not mental math.
+3. **Same-row link → horizontal line, perfectly level by construction:** `x1` = source right, `x2` = dest left, and `y1 = y2 = y+H/2` (identical, so it cannot tilt):
+   ```html
+   <line x1="190" y1="88" x2="240" y2="88" stroke="var(--text-secondary)" stroke-width="1.5" marker-end="url(#arrow)"/>
+   ```
+4. **Cross-row / cross-column link → choose ONE deterministic router (never a freehand diagonal):**
+   - **Orthogonal (L-shaped)** — clean "architecture" look; enters boxes square-on. Route H→V→H through a midpoint `mx = (srcX + dstX)/2`:
+     ```html
+     <!-- src bottom/right anchor → dst left anchor; mx is the elbow x -->
+     <path d="M380,180 H410 V88 H440" fill="none" stroke="var(--text-secondary)" stroke-width="1.5" marker-end="url(#arrow)"/>
+     ```
+   - **Smooth curve (cubic Bézier)** — softer look; control points are *derived* (not drawn) so it leaves the source and enters the dest horizontally, meeting the edge square-on. With `mx = (srcX+dstX)/2`: `C mx,srcY  mx,dstY  dstX,dstY`:
+     ```html
+     <path d="M380,180 C410,180 410,88 440,88" fill="none" stroke="var(--text-secondary)" stroke-width="1.5" marker-end="url(#arrow)"/>
+     ```
+   Pick orthogonal for dense/grid-like diagrams, curves for sparse/organic ones — but use the **formula** either way. Do not place control points or elbows by eye.
+
+**Marker (flush arrowheads):** use `refX="9"` so the tip sits on the box edge, and `markerUnits="userSpaceOnUse"` so head size is independent of `stroke-width`:
+```html
+<marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7"
+        orient="auto-start-reverse" markerUnits="userSpaceOnUse">
+  <path d="M0,0 L10,5 L0,10 z" fill="var(--text-secondary)"/>
+</marker>
+```
+
+**Pattern (grid + anchors + the marker above):**
 ```html
 <figure class="architecture-diagram">
   <svg viewBox="0 0 800 400" role="img" style="width: 100%; max-width: 800px;">
     <title>System Architecture — [Product Name]</title>
     <desc>Shows data flow from API Gateway through Lambda to DynamoDB and Bedrock</desc>
     <defs>
-      <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5"
-              markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-        <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--text-secondary)"/>
+      <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7"
+              orient="auto-start-reverse" markerUnits="userSpaceOnUse">
+        <path d="M0,0 L10,5 L0,10 z" fill="var(--text-secondary)"/>
       </marker>
     </defs>
-    <!-- Service box -->
-    <rect x="50" y="170" width="160" height="60" rx="8"
+    <!-- GRID: W=150 H=56 ; cols x=40,240 ; rows y=60,160. Anchors derived below. -->
+    <!-- Box A @ (40,60): right=(190,88) bottom=(115,116) -->
+    <rect x="40" y="60" width="150" height="56" rx="8"
           fill="var(--surface-card)" stroke="var(--border-default)" stroke-width="1.5"/>
-    <text x="130" y="205" text-anchor="middle"
+    <text x="115" y="92" text-anchor="middle"
           fill="var(--text-primary)" font-size="14" font-weight="600">API Gateway</text>
-    <!-- Arrow -->
-    <line x1="210" y1="200" x2="300" y2="200"
+    <!-- Box B @ (240,60): left=(240,88) -->
+    <rect x="240" y="60" width="150" height="56" rx="8"
+          fill="var(--surface-card)" stroke="var(--border-default)" stroke-width="1.5"/>
+    <text x="315" y="92" text-anchor="middle"
+          fill="var(--text-primary)" font-size="14" font-weight="600">Lambda</text>
+    <!-- Same-row arrow: A.right(190,88) → B.left(240,88), y identical -->
+    <line x1="190" y1="88" x2="240" y2="88"
           stroke="var(--text-secondary)" stroke-width="1.5" marker-end="url(#arrow)"/>
-    <!-- Next service box... -->
   </svg>
   <figcaption>Fig 1: High-level system architecture</figcaption>
 </figure>
@@ -447,6 +483,11 @@ Every PRD MUST include an inline SVG architecture diagram in the Technical Archi
 - Arrows: `var(--text-secondary)` with arrowhead marker
 - Group borders (for "VPC" or "Subnet" groupings): dashed stroke, `var(--border-subtle)`
 - No inline hex colors — always use CSS variables
+
+**`<defs>` discipline (prevents a blank diagram):**
+- `<defs>` holds ONLY definitions — `<marker>`, `<linearGradient>`, `<filter>`, `<style>`, `<symbol>`. It is never painted.
+- **Every rendered shape (`<rect>`, `<text>`, `<path>`, `<line>`, `<circle>`, `<g>`) MUST come AFTER `</defs>`** — exactly as in the pattern above. A shape left inside `<defs>`, or a `<defs>` you forgot to close, renders an invisible diagram that still passes `grep '<svg'` and ships blank.
+- **Validate, don't just confirm presence:** run the SVG checks on the PRD HTML (commands in `Shared Standards.md` → Syntax Gate) — `xmllint --noout` must pass (catches an unclosed `</defs>`) AND ≥1 shape element must exist outside `<defs>` (catches the trapped-shapes case). A `grep -c '<svg'` presence test is NOT sufficient.
 
 ### Step 11: Save Artifacts
 

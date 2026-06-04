@@ -68,6 +68,15 @@ The Technical Design section MUST include an inline SVG diagram showing service 
 - Boxes with service names, directional arrows, grouping borders for VPC/subnet
 - Keep it simple: show data flow between 3-8 services, not every edge case
 
+**Align arrows by formula — do NOT freehand endpoints (this is why arrows usually look misaligned):**
+- **Snap boxes to a grid:** fixed box width `W`/height `H`, fixed column/row pitch. Every `x`/`y` is a grid coordinate, never an arbitrary number.
+- **Derive anchors, don't guess:** for a box at `(x,y)` — right=`(x+W, y+H/2)`, left=`(x, y+H/2)`, bottom=`(x+W/2, y+H)`, top=`(x+W/2, y)`. Comment each box's anchors so endpoints are copy-paste.
+- **Same-row link:** horizontal `<line>` with `y1 = y2 = y+H/2` (identical → cannot tilt); `x1`=source right, `x2`=dest left.
+- **Cross-row link:** never a freehand diagonal. Use ONE deterministic router with midpoint `mx=(srcX+dstX)/2` — either orthogonal `<path d="M srcX,srcY H mx V dstY H dstX">` (clean/grid look) or a derived cubic `<path d="M srcX,srcY C mx,srcY mx,dstY dstX,dstY">` (smooth look). Both enter the box edge square-on. Pick per diagram; use the formula either way.
+- **Marker:** `refX="9"` (tip flush on edge) and `markerUnits="userSpaceOnUse"` (head size independent of stroke-width): `<marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="var(--text-secondary)"/></marker>`
+- **`<defs>` holds ONLY definitions** — `<marker>`, `<linearGradient>`, `<filter>`, `<style>`, `<symbol>`. It is never painted. **Every rendered shape (`<rect>`, `<text>`, `<path>`, `<line>`, `<circle>`, `<g>`) MUST come AFTER `</defs>`.** A shape left inside `<defs>` (or a `<defs>` you forgot to close) renders an invisible, blank diagram — and `grep '<svg'` still passes, so it ships. Always close every `<defs>`.
+- **Validate the diagram, don't just confirm it exists:** `xmllint --noout` must pass (catches an unclosed `</defs>`) AND at least one shape element must exist outside `<defs>`. Run both checks directly on the PRD HTML (commands in `#steering/product-workflow.md` → Runtime Environment Baseline → Syntax Gate). A presence test (`grep -c '<svg'`) is NOT sufficient.
+
 ## Reference
 
 See #steering/prd-guide.md for full methodology.

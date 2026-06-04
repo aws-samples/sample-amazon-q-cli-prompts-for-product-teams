@@ -239,6 +239,7 @@ Before completing:
 - [ ] Technology Research completed (current-year validated)
 - [ ] Every tech recommendation has a source link confirming current-year availability
 - [ ] **Inline SVG architecture diagram included** (service boxes, arrows, data flow — styled with CSS variables)
+- [ ] **SVG diagram actually paints** — `<defs>` is closed and all shapes are AFTER `</defs>`; verified with `xmllint --noout` (well-formed) + a shape-count outside `<defs>` ≥1 (commands in `#steering/product-workflow.md` → Syntax Gate), NOT just `grep '<svg'`
 - [ ] All PRFAQ features have corresponding requirements
 - [ ] Requirements use EARS syntax correctly
 - [ ] Acceptance criteria are testable

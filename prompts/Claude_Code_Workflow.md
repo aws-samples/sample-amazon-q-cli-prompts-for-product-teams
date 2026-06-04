@@ -323,7 +323,7 @@ Generate the Prototype Spec by loading `prompts/Prototype Spec Guide.md` and cre
 - [ ] Chat interfaces mocked with typing indicator and delayed responses (if applicable)
 - [ ] Modals open/close via button, X, backdrop, and Escape key
 - [ ] Data tables sort/filter/paginate (if applicable)
-- [ ] Data visualizations use bundled Chart.js (`lib/chart.min.js`, no external CDN)
+- [ ] Data visualizations reference a locally-downloaded Chart.js (`lib/chart.min.js`, fetched at build time into gitignored `documents/lib/`; no external CDN `<script src>`)
 - [ ] Chart colors use CSS variables (not hardcoded hex)
 - [ ] Interactions produce visible state changes (not just toast messages)
 - [ ] State persists during session navigation (localStorage for mock data)
@@ -520,7 +520,12 @@ When the user provides additional context (CSV files, company docs, team info):
 - All screens from PRD implemented
 - Navigation works between all screens (verified by post-build link audit)
 - No AI slop aesthetics
+- Syntax gate passed (run the `Shared Standards.md` → Syntax Gate commands: every `<script>` parses via JavaScriptCore, every `<svg>` well-formed with shapes outside `<defs>`, manifests valid — see `Prototype Creation Guide.md` Step 9.5 check 4.6)
+- Downloaded-asset integrity gate passed (every `documents/lib/` file: size sane + end-of-file signature via `tail`/`grep` — see `Prototype Creation Guide.md` Step 9.5 check 4.5)
+- Dependency-load guards + global error banner present on every screen (so failures surface visibly on a stock Mac)
 - Post-build validation passed (see `Prototype Creation Guide.md`)
+
+**Honest validation gating:** Grep presence-checks prove structure exists, not that code parses or paints. The syntax gate MUST pass first — a `<script>` that doesn't parse never runs its guard, so guards never excuse a parse error. On top of a passing syntax gate, do NOT report the prototype as "validated" unless either (a) the dependency-load guards + global error banner are in place (any *runtime* failure surfaces visibly in the browser), or (b) a real render was confirmed (user opened it and reported). Always state what was verified vs. assumed — e.g. "Syntax gate + static checks passed; runtime not executed, but graceful-degradation guards are in place."
 
 ---
 

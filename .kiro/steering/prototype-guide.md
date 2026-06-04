@@ -364,17 +364,63 @@ A visually striking navigation hub for reviewers. **Use the template at `.kiro/s
 
 For screens that need charts, graphs, or data visualizations:
 
-- **Include:** `<script src="lib/chart.min.js"></script>` at bottom of screen file (local file, NO CDN)
+**Fetch the library at build time (this repo ships NO library).** Charts are served locally, so the library must be downloaded into the gitignored `documents/lib/` during the Prototype phase — not committed, not loaded from a CDN. Do this once, before building chart screens, then run the integrity gate (Step 4.5):
+```bash
+mkdir -p documents/lib
+curl -sL -o documents/lib/chart.min.js "https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"
+# integrity gate (Step 4.5) — size sane AND export signature present:
+wc -c documents/lib/chart.min.js
+tail -c 200 documents/lib/chart.min.js | grep -q "window.Chart" && echo "OK: complete" || echo "FAIL: truncated — re-fetch"
+```
+(The `cdn.jsdelivr.net` URL is a one-time *build-time download* into a local file — NOT a runtime CDN `<script src>`. Screens always reference the local copy.)
+
+- **Include in screens:** `<script src="lib/chart.min.js"></script>` at bottom of screen file — references the locally-downloaded file, never a CDN URL
 - **Chart container:** Must have explicit height (e.g., `height: 300px`). Never `height: 100%`
 - **Theming:** Chart colors MUST use CSS variables extracted via `getComputedStyle` — never hardcode hex in Chart.js config
 - **States:** Implement loading skeleton, empty state, and error state for all chart containers
 - **Data:** Use realistic domain numbers, never placeholders
 
+**MANDATORY — Dependency-load guard (fail visibly, never silently):**
+On a stock Mac there is no devtools step to diagnose a blank card. If a downloaded library is truncated or missing, the screen MUST show a clear error state, not a blank box. Guard every use of the library:
+```html
+<script src="lib/chart.min.js"></script>
+<script>
+  if (typeof Chart === 'undefined') {
+    // Library failed to load (missing/truncated). Render a visible error in every chart box.
+    document.querySelectorAll('.chart-container').forEach(el => {
+      el.innerHTML = '<div class="chart-error" role="alert">⚠ Unable to load chart library</div>';
+    });
+  } else {
+    // ... build charts here ...
+  }
+</script>
+```
+A truncated `chart.min.js` then shows an obvious error a one-second glance catches — instead of a blank card.
+
+**Guard scope (important):** this guard catches a *missing/truncated library* only. It does NOT catch a *syntax error in your own script* — an unbalanced `}` in the `new Chart({…})` config makes the whole `<script>` block fail to parse, so the guard never runs. Mitigate separately: keep Chart.js configs **multi-line and readable** (don't compress nested options onto one line where a missing brace hides), and rely on the syntax gate (Step 4.6) to catch parse errors pre-delivery.
+
+**MANDATORY — Global error banner (every screen, charts or not):**
+Add this near the top of each screen so any uncaught script error surfaces as a visible, self-describing banner instead of a silent blank screen. This is the single highest-leverage safeguard in a no-admin environment — it needs zero external tooling:
+```html
+<script>
+  window.addEventListener('error', e => {
+    let b = document.getElementById('__err_banner');
+    if (!b) {
+      b = document.createElement('div');
+      b.id = '__err_banner';
+      b.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:99999;background:#b00020;color:#fff;padding:10px 16px;font:14px/1.4 sans-serif;';
+      document.body.appendChild(b);
+    }
+    b.textContent = '⚠ Script error: ' + e.message;
+  });
+</script>
+```
+
 ### File Structure Example
 ```
 ./documents/
-├── lib/
-│   └── chart.min.js                               (Chart.js 4.x — bundled, no CDN)
+├── lib/                                           (gitignored — downloaded at build time, never committed)
+│   └── chart.min.js                               (Chart.js 4.x — curl'd into place during Prototype phase)
 ├── [product-slug].css                             (shared CSS — create FIRST)
 ├── DesignSystem_[Product]_[YYYY-MM-DD].html      (visual reference page)
 ├── ScreenIndex_[Product]_[YYYY-MM-DD].html       (navigation hub)
@@ -494,6 +540,39 @@ After all screens are created, run these checks. **Fix any issues before showing
 - Screen-specific JS: inline, < 5KB
 - ClickablePrototype: < 300KB (exempt from external CSS rule)
 
+### 4.5. Downloaded-Asset Integrity Gate (base shell tools — `wc`/`tail`/`grep`, every platform)
+
+**After downloading ANY library into `documents/lib/`, verify it is complete before relying on it.** The known failure: a truncated `lib/chart.min.js` trusted without checking — it loaded partially, `Chart` was never defined, and every chart rendered as a blank card with no error. A build-time download can truncate just as easily as a committed file, so the gate is mandatory. This check needs only `wc`/`tail`/`grep` (present on every platform) — no `node` or headless Chrome required:
+
+```bash
+# 1. Size sanity — Chart.js v4 UMD is ~200KB. Flag if dramatically smaller.
+wc -c documents/lib/chart.min.js          # expect ~208000; < 180000 is suspicious
+
+# 2. End-of-file signature — a complete Chart.js UMD ends with the export footer.
+tail -c 200 documents/lib/chart.min.js | grep -q "window.Chart" && echo "OK: export signature present" || echo "FAIL: truncated/invalid"
+tail -c 200 documents/lib/chart.min.js | grep -q "sourceMappingURL" && echo "OK: sourcemap marker present"
+```
+
+- A truncated file fails the `grep` with no `node` needed (it ends mid-statement, e.g. `...height;Object` with no `window.Chart=` footer).
+- **Remedy if invalid:** re-fetch once and re-verify:
+  ```bash
+  curl -sL -o documents/lib/chart.min.js "https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"
+  wc -c documents/lib/chart.min.js
+  tail -c 200 documents/lib/chart.min.js | grep -q "window.Chart" && echo "OK: complete" || echo "FAIL: still truncated"
+  ```
+- Apply the same pattern (size + end-signature) to any other downloaded library.
+
+### 4.6. Syntax Gate (MANDATORY — parse JS/SVG, do not just grep)
+
+**A presence check is not a validity check.** `grep -c '<svg'` passes on a structurally dead diagram; grepping for an error banner passes on a `<script>` that doesn't parse. The known incidents: an unbalanced `}` in a compressed `new Chart({…})` config made the entire `<script>` fail to parse (so the `typeof Chart` load-guard never even ran), and shapes authored inside `<defs>` rendered blank though the SVG was "present." Both ship through grep-only validation.
+
+**Run the syntax gate before any screen is considered done.** This project ships no scripts — run the commands directly. The exact, platform-aware one-liners (native first → install if missing → honest-skip + warn) are in `#steering/product-workflow.md` → Runtime Environment Baseline → Syntax Gate. For each screen, they check:
+- Every inline `<script>` block parses without executing — via `osascript -l JavaScript` (macOS) or `node --check` (Linux/Windows/any) (catches unbalanced braces, unexpected tokens).
+- Every `<svg>` is well-formed — `xmllint --noout` or `python3` — AND has ≥1 shape element **outside** `<defs>` (catches blank diagrams).
+- Every `.json` manifest parses — `plutil -convert json` / `python3 -m json.tool` / `node` / `jq` (whichever is present).
+
+**A screen whose script does not parse is FAILED — regardless of whether the load-guard and error banner are present.** The dependency-load guard protects against a *missing/truncated library*, not against a *syntax error in your own code*; a parse error takes down the whole block, guard included. Use the validator available on this machine (detect, prefer native, install user-level if missing) — don't skip the check just because the macOS tool isn't present.
+
 ### 5. Visual Consistency Check (Theme Coherence)
 
 Scan all `Screen_*.html` files for hardcoded colors that conflict with the shared CSS theme:
@@ -533,6 +612,8 @@ Re-run the Logo Gate on the final embedded URL:
 - Verify at least one form shows feedback on submit
 
 **This is the authoritative quality gate for prototypes.**
+
+**Benign console noise — do not chase:** `file:` URLs are treated as unique security origins is a normal local-file warning emitted when opening prototypes via `file://`. It is never the cause of a rendering bug. Don't treat it as a defect or spend time on it.
 
 ### 9. CSS Layout Check
 

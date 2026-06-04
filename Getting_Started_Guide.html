@@ -859,7 +859,7 @@ curl -fsSL https://cli.kiro.dev/install | bash
 
                 <div class="callout success">
                     <h4>All Outputs are Standalone HTML</h4>
-                    <p>Every document is a self-contained HTML file that opens directly in any browser. No build step, no server, no dependencies beyond Google Fonts. Share with stakeholders by simply sending the files.</p>
+                    <p>Every document is a self-contained HTML file that opens directly in any browser. No build step, no server, and no CDN-loaded scripts &mdash; any library (e.g. Chart.js) is downloaded locally at build time; the only external reference is Google Fonts CSS, which degrades gracefully offline. Share with stakeholders by simply sending the files.</p>
                 </div>
 
                 <h3>Compatible Tools</h3>
@@ -1000,6 +1000,7 @@ kiro
                         <li>Copy the <code>prompts</code> folder to your project</li>
                         <li>Copy <code>CLAUDE.md</code> to your project root (for Claude Code)</li>
                         <li>Copy <code>.cursorrules</code> to your project root (for Cursor &mdash; it will appear faded)</li>
+                        <li>Copy the <code>.claude</code> folder to your project root (Claude Code: native subagents, skills, and validation hooks)</li>
                         <li>Create a <code>documents</code> folder in your project (for outputs)</li>
                     </ol>
 
@@ -1013,6 +1014,9 @@ cp -r /path/to/toolkit/prompts .
 
 <span class="comment"># For Claude Code: copy CLAUDE.md (auto-loads)</span>
 cp /path/to/toolkit/CLAUDE.md .
+
+<span class="comment"># For Claude Code: copy the native layer (subagents, skills, validation hooks)</span>
+cp -r /path/to/toolkit/.claude .
 
 <span class="comment"># For Cursor: copy .cursorrules (hidden file, auto-loads)</span>
 cp /path/to/toolkit/.cursorrules .
@@ -1074,8 +1078,8 @@ claude
 <span class="comment"># For Kiro (copy .kiro folder)</span>
 cp -r /path/to/toolkit/.kiro /path/to/your-project/ && mkdir -p /path/to/your-project/documents
 
-<span class="comment"># For Claude Code</span>
-cp -r /path/to/toolkit/prompts /path/to/your-project/ && cp /path/to/toolkit/CLAUDE.md /path/to/your-project/ && mkdir -p /path/to/your-project/documents
+<span class="comment"># For Claude Code (prompts + CLAUDE.md + native .claude layer)</span>
+cp -r /path/to/toolkit/prompts /path/to/your-project/ && cp /path/to/toolkit/CLAUDE.md /path/to/your-project/ && cp -r /path/to/toolkit/.claude /path/to/your-project/ && mkdir -p /path/to/your-project/documents
 
 <span class="comment"># For Cursor</span>
 cp -r /path/to/toolkit/prompts /path/to/your-project/ && cp /path/to/toolkit/.cursorrules /path/to/your-project/ && mkdir -p /path/to/your-project/documents
@@ -1107,8 +1111,14 @@ your-project/
 your-project/
 ├── <span class="highlight">CLAUDE.md</span>                     <span class="comment">(auto-loads in Claude Code)</span>
 ├── <span class="highlight">.cursorrules</span>                  <span class="comment">(hidden - auto-loads in Cursor)</span>
+├── <span class="highlight">.claude/</span>                      <span class="comment">(Claude Code native layer - hidden)</span>
+│   ├── agents/                    <span class="comment">(6 subagents, incl. parallel screen-builder)</span>
+│   ├── skills/                    <span class="comment">(4 phase skills)</span>
+│   └── settings.json              <span class="comment">(advisory validation hooks)</span>
 ├── prompts/
 │   ├── Claude_Code_Workflow.md    <span class="comment">(main workflow guide)</span>
+│   ├── Orchestrator.md            <span class="comment">(coordination + agent dispatch)</span>
+│   ├── Shared Standards.md        <span class="comment">(runtime baseline, syntax gate)</span>
 │   ├── Deep Research Agent.md
 │   ├── AI Framing Agent.md
 │   ├── PRFAQ Guide.md
@@ -1117,10 +1127,12 @@ your-project/
 │   └── Prototype Creation Guide.md
 │
 └── documents/                      <span class="comment">(auto-generated outputs)</span>
+    ├── lib/chart.min.js            <span class="comment">(downloaded at build time)</span>
     ├── MarketResearch_*.html
     ├── PRFAQ_*.html
     ├── PRD_*.html
-    └── Screen_*.html
+    ├── Screen_*.html
+    └── ProjectDashboard_*.html     <span class="comment">(live status)</span>
                 </div>
             </div>
         </div>
@@ -1340,39 +1352,39 @@ samples/
         <div id="tips" class="tab-content">
             <div class="section">
                 <h2>Tips & Agent Hooks</h2>
-                <p>The <code>.kiro/hooks.json</code> file includes 26 PM-focused agents that activate automatically or on-demand.</p>
+                <p>The <code>.kiro/hooks.json</code> file includes 16 hooks that activate automatically (on file save) or on-demand. Claude Code users get equivalent native agents, skills, and validation hooks under <code>.claude/</code> &mdash; see Option B.</p>
 
                 <div class="hooks-category">
-                    <h4>Automatic Validation</h4>
+                    <h4>Automatic Validators (on file save)</h4>
                     <div class="hooks-list">
-                        <div class="hook-item"><strong>Deep Market Research Validator</strong><span>Checks 120+ sources, 6 dimensions, quality gates</span></div>
-                        <div class="hook-item"><strong>PRFAQ Quality Check</strong><span>Validates headline, problem, solution</span></div>
-                        <div class="hook-item"><strong>PRD Requirements Validator</strong><span>EARS syntax, acceptance criteria</span></div>
-                        <div class="hook-item"><strong>Design System Consistency</strong><span>Prevents AI slop aesthetics</span></div>
+                        <div class="hook-item"><strong>Market Research Validator</strong><span>Checks sources, 6 dimensions, quality gates, brand assets</span></div>
+                        <div class="hook-item"><strong>PRFAQ Validator</strong><span>Validates headline, problem, solution, skeptical FAQ</span></div>
+                        <div class="hook-item"><strong>PRD Validator</strong><span>EARS syntax, testable acceptance criteria, AWS-native</span></div>
+                        <div class="hook-item"><strong>Design System Validator</strong><span>Prevents AI slop; checks brand compliance</span></div>
+                        <div class="hook-item"><strong>Screen Validator</strong><span>Full interactivity, branding, CSS tokens, layout</span></div>
+                        <div class="hook-item"><strong>Kiro Spec Validator</strong><span>EARS syntax in requirements.md</span></div>
                         <div class="hook-item"><strong>Tech Stack Validator</strong><span>Prefers AWS-native services</span></div>
-                        <div class="hook-item"><strong>Prototype Structure Check</strong><span>Ensures modular files</span></div>
                     </div>
                 </div>
 
                 <div class="hooks-category">
-                    <h4>Research & Analysis</h4>
+                    <h4>Automatic Phase Transitions (on file save)</h4>
+                    <div class="hooks-list">
+                        <div class="hook-item"><strong>Market Research &rarr; PRFAQ</strong><span>Prompts to continue after research</span></div>
+                        <div class="hook-item"><strong>PRFAQ &rarr; PRD</strong><span>Prompts to continue after PRFAQ</span></div>
+                        <div class="hook-item"><strong>PRD &rarr; Prototype</strong><span>Prompts to continue after PRD</span></div>
+                    </div>
+                </div>
+
+                <div class="hooks-category">
+                    <h4>Manual Analysis Lenses (run on demand)</h4>
                     <div class="hooks-list">
                         <div class="hook-item"><strong>Customer Interview Simulator</strong><span>Roleplay as personas to stress-test concepts</span></div>
                         <div class="hook-item"><strong>Competitive Response Analyzer</strong><span>Predict how competitors might respond</span></div>
-                        <div class="hook-item"><strong>User Journey Mapper</strong><span>Create detailed journey maps</span></div>
                         <div class="hook-item"><strong>Risk Analyzer</strong><span>Identify product and business risks</span></div>
-                        <div class="hook-item"><strong>Competitor Feature Matrix</strong><span>Side-by-side feature comparison</span></div>
-                    </div>
-                </div>
-
-                <div class="hooks-category">
-                    <h4>Strategy & UX</h4>
-                    <div class="hooks-list">
-                        <div class="hook-item"><strong>Feature Prioritizer (RICE)</strong><span>Apply RICE framework to backlog</span></div>
-                        <div class="hook-item"><strong>A/B Test Hypothesis Generator</strong><span>Design experiments for assumptions</span></div>
-                        <div class="hook-item"><strong>Microcopy Writer</strong><span>Generate UI text and labels</span></div>
-                        <div class="hook-item"><strong>Onboarding Flow Designer</strong><span>Design first-time user experience</span></div>
-                        <div class="hook-item"><strong>Accessibility Auditor</strong><span>WCAG 2.1 AA compliance check</span></div>
+                        <div class="hook-item"><strong>Feature Prioritizer (RICE)</strong><span>Apply RICE framework to the backlog</span></div>
+                        <div class="hook-item"><strong>Accessibility Auditor</strong><span>WCAG AA compliance check</span></div>
+                        <div class="hook-item"><strong>Interactivity & Link Checker</strong><span>Verify all links and interactions work</span></div>
                     </div>
                 </div>
 

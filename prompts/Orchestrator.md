@@ -163,8 +163,13 @@ For each phase, you will:
    - Include only essential context (see `Handoff Schema.md`)
    - Reference artifact paths, don't copy full content
 
-2. **Invoke Specialized Agent**
-   - Use the Task tool with appropriate subagent_type
+2. **Invoke Specialized Agent** (these are real subagents in `.claude/agents/`)
+   - Use the Task tool with the matching `subagent_type`:
+     - Deep Market Research → `deep-research`
+     - PRFAQ → `prfaq`
+     - PRD → `prd`
+     - Prototype → `design-system` first (shared CSS + Design Token Contract), then one `screen-builder` per screen (dispatched in parallel), then assemble the ScreenIndex
+     - Reviews / audits → `product-reviewer` (lens named in the prompt)
    - Pass the handoff payload in the prompt
    - Specify: "Output your results as structured JSON per Handoff Schema"
 
@@ -496,6 +501,9 @@ Assets & Scripts:
 - Use the logo URL provided — do NOT search for a different one
 - All font imports in the shared CSS only — no <link> to Google Fonts in screen files
 - JavaScript event listeners scoped to screen container — no bare document.addEventListener, no global variables
+- FAIL VISIBLY (stock Mac, no devtools): add the global error banner to every screen so uncaught errors show as a visible bar, not a blank page:
+    <script>window.addEventListener('error',e=>{let b=document.getElementById('__err_banner');if(!b){b=document.createElement('div');b.id='__err_banner';b.style.cssText='position:fixed;top:0;left:0;right:0;z-index:99999;background:#b00020;color:#fff;padding:10px 16px;font:14px/1.4 sans-serif;';document.body.appendChild(b);}b.textContent='⚠ Script error: '+e.message;});</script>
+- If this screen uses charts: guard the library before use — if (typeof Chart === 'undefined') render a visible "Unable to load chart" in each .chart-container and return. Never let a missing/truncated lib produce a blank card. The guard only covers a missing lib — NOT a syntax error in your own config (a parse error kills the whole <script> so the guard never runs). Keep Chart.js configs multi-line and readable; never compress nested options onto one line where a missing brace hides.
 
 QUALITY EXPECTATIONS
 ────────────────────
@@ -623,23 +631,21 @@ If handoff is missing required fields:
 
 ## Dashboard Management
 
-After each phase completion, update dashboard:
+**The dashboard is data-driven — regenerate it wholesale, never patch its structure.**
 
-```html
-<!-- Update progress bar -->
-<div class="progress-bar" style="width: {percentage}%"></div>
-
-<!-- Update phase status -->
-<div class="phase phase-{n}" data-status="completed">
-  <span class="status-badge">✓ Completed</span>
-  <a href="{artifact_path}">View {Phase} Document</a>
-</div>
-
-<!-- Update remaining phases -->
-<div class="phase phase-{n+1}" data-status="in-progress">
-  <span class="status-badge">In Progress</span>
-</div>
+The dashboard renders all phase rows from a single phase-state array:
+```js
+const PHASES = [
+  { name: "Deep Market Research", status: "completed", doc: "MarketResearch_[Product]_[Date].html" },
+  { name: "PRFAQ",                status: "pending",   doc: null },
+  { name: "PRD",                  status: "pending",   doc: null },
+  { name: "Prototype",            status: "pending",   doc: null },
+];
 ```
+
+After each phase completion, **change one phase's `status`/`doc` value in the array and re-emit the entire dashboard file**. The progress bar %, status badges, and document links all derive from the array.
+
+**NEVER apply chained string-replace edits to the dashboard's structural HTML** (phase rows, badges, links). In-place structural patching is what produced the orphaned `<div>` (unbalanced tag) in the post-mortem. When phases render from the array, a status update changes a data value only and cannot produce malformed markup. The template at `ProjectDashboard_Template.html` already renders from this array — copy it and edit the array; do not hand-edit its rows.
 
 ## What You Do NOT Do
 

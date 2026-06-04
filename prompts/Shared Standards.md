@@ -4,6 +4,66 @@ This document contains standards and conventions that ALL specialized agents mus
 
 ---
 
+## Runtime Environment Baseline (READ FIRST)
+
+**This may run on macOS, Linux, or Windows — detect the platform and choose validators accordingly; do NOT hard-code macOS tools.** The verification goal is identical everywhere (confirm code *parses*, not just that it *exists*); only the tool that parses changes per OS. Never assume a tool is present — detect with `command -v`. Never silently skip a check because the macOS tool is missing on another OS — that re-creates the exact silent-no-op failure this gate prevents.
+
+**Tool-selection procedure (per check): native first → install if missing → honest-skip + warn.**
+1. **Prefer a validator already on the machine**, native first (detect via `command -v`).
+2. **If none can do the check, install one** — try non-admin methods first (`npm i -g --prefix ~/.local`, `npx`, `pip install --user`). **If only an admin/system install would work (sudo, system brew/apt/winget), ASK the user first. Never silently run `sudo`.**
+3. **If no validator is available and install is declined/fails, WARN and continue** — state exactly what was skipped and why (e.g. `⚠ JS syntax gate SKIPPED: no JS parser (tried osascript, node)`). Never report a skipped check as "passed."
+
+**This project ships NO code.** It is a steering/prompt repo — no scripts, no helper binaries, no bundled libraries are committed. Do not create a `scripts/` directory or commit any `.sh`/`.js` tool. Run validation as ad-hoc commands you type directly (below). Any library a prototype needs is **downloaded at build time** into the gitignored `documents/lib/`, never committed (see `Prototype Creation Guide.md` → Data Visualization).
+
+**Serve locally → the rule is about REMOTE EXECUTABLE CODE, not all network requests.** Prototypes open from the local filesystem, so the line is:
+
+- **BLOCK remote executable code.** Never reference a CDN `<script src>` for a JS library (Chart.js, etc.) — it's a remote-code dependency that fails offline. Download libraries at build time into `documents/lib/` and reference them locally; or hand-write the JS inline.
+- **ALLOW non-executing style resources that degrade gracefully offline.** A CDN reference for *styling* is fine when it (a) executes no JavaScript and (b) falls back sensibly if it doesn't load. This covers Google Fonts CSS **and** its font files (`fonts.googleapis.com` for the CSS, `fonts.gstatic.com` for the woff2) — both belong in the shared CSS only, and degrade to system fonts offline. The same logic extends to an icon-font CDN (e.g. Font Awesome / Material Symbols): allowed as a fallback, since it's CSS + a font with no code execution.
+- **Icons — prefer inline SVG.** Default to hand-authored inline `<svg>` icons: fully offline-safe, fully styleable, no slop. Reach for an icon-font CDN only as a fallback when inline SVG is impractical (it falls under the style-resource allowance above).
+
+Note: a `w3.org` URL in an SVG (`xmlns="http://www.w3.org/2000/svg"`) is a **namespace identifier, not a network fetch** — nothing downloads it. Never flag, rewrite, or "localize" it.
+
+**What this means for verification:**
+- Every validation step must run with whatever validator the machine has, OR be **baked into the generated artifacts** (dependency-load guards + a global error banner — see `Prototype Creation Guide.md`; these are the cross-platform safety net, surfacing failures in any browser regardless of validator availability).
+- You cannot run the app in a JS runtime or render it in headless Chrome to confirm it works. A "real render" means the user opening the file in their browser — which only helps if the artifact fails *visibly* rather than silently.
+- Build-time-downloaded libraries (e.g. a fetched `documents/lib/chart.min.js`) must be integrity-checked with `wc`/`tail`/`grep` (present on every platform), never trusted blindly.
+
+**Syntax Gate — validate generated code by PARSING it; presence-checks are not enough.** `grep -c '<svg'` confirms a tag exists, not that the diagram paints; grep for an error banner confirms text exists, not that the surrounding script parses. Pick the validator for THIS machine (native first → install → honest-skip):
+
+1. **JS syntax — every inline `<script>` block must parse without executing.** Extract blocks, parse each with the available validator:
+```bash
+perl -0777 -ne 'while(/<script\b([^>]*)>(.*?)<\/script>/gis){next if $1=~/\bsrc\s*=/i; next if $2=~/^\s*$/; print $2,"\0"}' FILE.html |
+while IFS= read -r -d '' body; do
+  printf '%s' "$body" > /tmp/__blk.js
+  if command -v osascript >/dev/null; then        # macOS: JavaScriptCore, compiles without executing
+    osascript -l JavaScript -e 'ObjC.import("Foundation");var s=$.NSString.stringWithContentsOfFileEncodingError("/tmp/__blk.js",$.NSUTF8StringEncoding,null);try{new Function(s.js);"OK"}catch(e){"FAIL: "+e.message}'
+  elif command -v node >/dev/null; then            # any OS: `node --check` is syntax-check ONLY, no execution
+    node --check /tmp/__blk.js >/dev/null 2>&1 && echo OK || { echo -n "FAIL: "; node --check /tmp/__blk.js 2>&1 | head -1; }
+  else echo "⚠ JS syntax gate SKIPPED: no JS parser (tried osascript, node) — install Node user-level or run where one exists"; fi
+done
+```
+Any `FAIL:` line → the screen is FAILED (the load-guard can't save a block that doesn't parse). Inline `<script>` blocks are classic scripts, so `node --check` parses them correctly.
+
+2. **SVG well-formed AND it paints:**
+```bash
+if command -v xmllint >/dev/null; then xmllint --noout FILE.html;                          # macOS + most Linux
+elif command -v python3 >/dev/null; then python3 -c 'import sys,xml.dom.minidom as m; m.parse(sys.argv[1])' FILE.html;
+else echo "⚠ XML well-formedness SKIPPED: install xmllint or python3"; fi                    # Windows alt: powershell -c "[xml](Get-Content FILE.html)"
+perl -0777 -pe 's{<defs\b.*?</defs>}{}gis' FILE.html | grep -coE '<(rect|circle|line|path|text|polygon|polyline|ellipse|image|use)\b'
+```
+A `0` from the second line = all shapes trapped in `<defs>` = blank diagram = FAILED. (The paint count is pure text — works on every platform.)
+
+3. **JSON manifests** — first available wins:
+```bash
+if command -v plutil >/dev/null; then plutil -convert json -o /dev/null FILE.json;          # macOS (NOT `plutil -lint` — parses as plist, rejects valid JSON)
+elif command -v python3 >/dev/null; then python3 -m json.tool FILE.json >/dev/null;
+elif command -v node >/dev/null; then node -e 'JSON.parse(require("fs").readFileSync(process.argv[1]))' FILE.json;
+elif command -v jq >/dev/null; then jq empty FILE.json;
+else echo "⚠ JSON validation SKIPPED: install python3, node, or jq"; fi
+```
+
+---
+
 ## File Naming Conventions
 
 ### Document Files
@@ -39,21 +99,24 @@ project_root/
 ├── prompts/                    # Agent prompts (read-only)
 ├── templates/                  # Templates (read-only)
 └── documents/                  # Generated artifacts
-    ├── lib/                   # Bundled JS libraries (no CDN dependencies)
-    │   └── chart.min.js       # Chart.js 4.x UMD bundle (~156KB)
+    ├── lib/                   # JS libraries DOWNLOADED at build time (gitignored, never committed)
+    │   └── chart.min.js       # Chart.js 4.x UMD — curl'd in during Prototype phase
     ├── handoffs/              # Inter-agent communication logs
     └── [all generated files]
 ```
 
-### Bundled Libraries
+### Local Libraries (downloaded at build time — never committed)
 
-| Library | Path | Purpose | Include Pattern |
-|---------|------|---------|-----------------|
-| Chart.js 4.x | `documents/lib/chart.min.js` | Data visualization in prototype screens | `<script src="lib/chart.min.js"></script>` |
+This repo ships no libraries. When a prototype needs one, download it into the gitignored `documents/lib/` during the Prototype phase, then run the integrity gate (`Prototype Creation Guide.md` Step 9.5 check 4.5).
 
-**Rules for bundled libraries:**
+| Library | Download (build time) | Local reference in screens |
+|---------|----------------------|----------------------------|
+| Chart.js 4.x | `curl -sL -o documents/lib/chart.min.js "https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"` | `<script src="lib/chart.min.js"></script>` |
+
+**Rules for local libraries:**
+- The `curl` above is a one-time *build-time download* into a local file — screens NEVER reference a CDN URL for a script/library. All executable code must work offline from the filesystem at view time (see Runtime Environment Baseline → "Serve locally → the rule is about REMOTE EXECUTABLE CODE"). Non-executing style resources that degrade offline (Google Fonts CSS + its font files; an icon-font CDN as fallback) are allowed under that principle.
 - Always reference via relative path from `documents/` (screens are siblings of `lib/`)
-- NEVER use external CDN URLs — all assets must work offline from the filesystem
+- After downloading, verify integrity (size + end-of-file signature) before relying on it — a download can truncate
 - Chart colors MUST use CSS variables (extracted via `getComputedStyle`) — never hardcoded hex
 
 ---

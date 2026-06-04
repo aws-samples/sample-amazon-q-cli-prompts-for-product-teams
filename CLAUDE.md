@@ -17,6 +17,15 @@ When the user describes a product idea or asks to start product development, fol
 - Technology Research runs inside PRD (validates current-year tech availability)
 - Prototype Spec runs at the start of Prototype (defines interactions before screen building)
 
+**Project Dashboard — update after EVERY phase (MANDATORY, do not skip):**
+Create `documents/ProjectDashboard_[Product]_[YYYY-MM-DD].html` at the START (all phases "pending"), then after each phase completes:
+1. Save the phase document
+2. **Regenerate the dashboard wholesale** from its `PHASES` array — update that phase's `status` ("completed") and `doc` (the new filename); re-emit the whole file (progress %, timestamp, links all derive from the array). Never str-replace its structural HTML.
+3. `open ./documents/ProjectDashboard_[Product]_[YYYY-MM-DD].html`
+4. Tell the user: "Dashboard updated — [Phase] complete."
+
+This keeps the dashboard live as you go. Full protocol + template: `prompts/Claude_Code_Workflow.md` and `prompts/ProjectDashboard_Template.html`.
+
 **Key rules:**
 - All outputs are **HTML files** saved to `./documents/`
 - Use file naming: `[Type]_[Product]_[YYYY-MM-DD].html`
@@ -105,6 +114,13 @@ Load these as needed during each phase:
 - `prompts/PRD Creation Guide.md`
 - `prompts/Prototype Spec Guide.md` (internal — used by agent during Prototype phase)
 - `prompts/Prototype Creation Guide.md`
+
+## Native Claude Code Primitives
+
+This repo ships native Claude Code integration alongside the prose guides (single source of truth remains `prompts/*.md`):
+- **Subagents** (`.claude/agents/`): `deep-research`, `prfaq`, `prd`, `design-system`, `screen-builder` (parallel, one per screen), `product-reviewer`.
+- **Skills** (`.claude/skills/`): `product-research`, `product-prfaq`, `product-prd`, `product-prototype` — auto-load the relevant guide when that phase is active.
+- **Validation hooks** (`.claude/settings.json`): on Write/Edit of `Screen_*.html` the JS syntax gate runs; on `PRD_*.html` the SVG paint check runs. Advisory (never blocks). Cross-platform: prefers native validators (macOS `osascript`/`xmllint`/`plutil`), falls back to `node`/`python3` on Linux/Windows, and honest-skips with a warning if none are present.
 
 ## Sample Outputs
 

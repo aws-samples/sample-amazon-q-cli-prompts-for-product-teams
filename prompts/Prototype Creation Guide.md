@@ -499,6 +499,7 @@ Before building any screens, commit to a **bold, intentional aesthetic direction
 - Break grids intentionally—asymmetry, overlap, diagonal flow
 - Customize every component to match your aesthetic
 - Create visual hierarchy through bold contrast
+- **Icons:** prefer hand-authored inline `<svg>` (offline-safe, fully styleable). An icon-font CDN (Font Awesome, Material Symbols) is an acceptable fallback only — see `Shared Standards.md` → Runtime Environment Baseline for the CDN rule (style resources OK; never a CDN `<script>`).
 
 ### Step 3: Map User Flows
 
@@ -748,7 +749,17 @@ These rules prevent the most common layout and scripting bugs in prototypes. All
 
 #### Data Visualization with Chart.js
 
-**Include:** `<script src="lib/chart.min.js"></script>` at the bottom of any screen file that needs charts. This is a local file (no CDN, no cross-site requests). Never reference external CDN URLs for charting.
+**Fetch the library at build time — this repo ships NO library.** Charts are served from the local filesystem, so download Chart.js into the gitignored `documents/lib/` once during the Prototype phase (before building chart screens), then run the integrity gate:
+```bash
+mkdir -p documents/lib
+curl -sL -o documents/lib/chart.min.js "https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"
+# integrity gate (Step 9.5 check 4.5) — size sane AND export signature present:
+wc -c documents/lib/chart.min.js
+tail -c 200 documents/lib/chart.min.js | grep -q "window.Chart" && echo "OK: complete" || echo "FAIL: truncated — re-fetch"
+```
+This is a one-time *build-time download* into a local file — NOT a runtime CDN reference. `documents/lib/` is gitignored and never committed.
+
+**Include in screens:** `<script src="lib/chart.min.js"></script>` at the bottom of any screen file that needs charts. This references the locally-downloaded file (no CDN, no cross-site requests at view time). Never reference an external CDN URL in a screen.
 
 **When to use:** Dashboard screens, analytics views, metrics panels, progress tracking — any screen where persona dashboard_widgets include charts, graphs, or data visualizations.
 
@@ -809,6 +820,41 @@ These rules prevent the most common layout and scripting bugs in prototypes. All
 - **Empty:** "No data yet" message with an icon and a CTA (e.g., "Import your first dataset")
 - **Error:** "Unable to load chart data" with a retry button
 - **Loaded:** The chart with realistic data
+
+**MANDATORY — Dependency-load guard (fail visibly, never silently):**
+The target machine is a stock Mac without admin or devtools (see `Shared Standards.md` → Runtime Environment Baseline). If `lib/chart.min.js` is missing or truncated, the screen must show a visible error, NOT a blank card. Guard every use of the library:
+```html
+<script src="lib/chart.min.js"></script>
+<script>
+  if (typeof Chart === 'undefined') {
+    // Library failed to load (missing/truncated) — render a visible error in every chart box.
+    document.querySelectorAll('.chart-container').forEach(el => {
+      el.innerHTML = '<div class="chart-error" role="alert">⚠ Unable to load chart library</div>';
+    });
+  } else {
+    // ... build charts here ...
+  }
+</script>
+```
+
+**Guard scope — this does NOT cover your own syntax errors.** The guard catches a *missing/truncated library*. It does NOT catch an unbalanced `}` in your `new Chart({…})` config — a parse error makes the ENTIRE `<script>` block fail, so the guard never runs. Defend separately: write **multi-line, readable Chart.js configs** (never compress a deeply-nested options object onto one line where a missing brace is invisible), and run the syntax gate (Step 9.5 check 4.6) so JavaScriptCore catches the parse error before delivery.
+
+**MANDATORY — Global error banner (every screen, charts or not):**
+Add this near the top of `<body>` on every screen so any uncaught script error surfaces as a visible, self-describing banner instead of a silent blank screen. Zero external tooling required — it works in the user's already-open browser:
+```html
+<script>
+  window.addEventListener('error', e => {
+    let b = document.getElementById('__err_banner');
+    if (!b) {
+      b = document.createElement('div');
+      b.id = '__err_banner';
+      b.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:99999;background:#b00020;color:#fff;padding:10px 16px;font:14px/1.4 sans-serif;';
+      document.body.appendChild(b);
+    }
+    b.textContent = '⚠ Script error: ' + e.message;
+  });
+</script>
+```
 
 #### Font Loading
 - All `@import url('https://fonts.googleapis.com/...')` statements MUST be in the shared CSS file ONLY
@@ -1275,6 +1321,38 @@ After all screens are created, run these checks. **Fix any issues before showing
   - ClickablePrototype: < 300KB
 - Flag any files exceeding limits for review
 
+#### 4.5. Downloaded-Asset Integrity Gate (base shell tools — `wc`/`tail`/`grep`, every platform)
+
+**After downloading ANY library into `documents/lib/`, verify it is complete before relying on it.** The known incident: a truncated `lib/chart.min.js` trusted without checking — it loaded partially, `Chart` was never defined, and every chart rendered blank with no error. A build-time download can truncate as easily as a committed file, so this gate is mandatory. It needs only `wc`/`tail`/`grep` (present on every platform) — no `node` or headless Chrome required:
+
+```bash
+# 1. Size sanity — Chart.js v4 UMD is ~208KB. Flag if dramatically smaller.
+wc -c documents/lib/chart.min.js          # < 180000 is suspicious
+
+# 2. End-of-file signature — a complete Chart.js UMD ends with the export footer.
+tail -c 200 documents/lib/chart.min.js | grep -q "window.Chart" && echo "OK: signature present" || echo "FAIL: truncated"
+tail -c 200 documents/lib/chart.min.js | grep -q "sourceMappingURL" && echo "OK: sourcemap marker present"
+```
+
+A truncated file fails the `grep` (it ends mid-statement, e.g. `...height;Object`, with no `window.Chart=` footer). **Remedy if invalid — re-fetch once and re-verify:**
+```bash
+curl -sL -o documents/lib/chart.min.js "https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"
+wc -c documents/lib/chart.min.js
+tail -c 200 documents/lib/chart.min.js | grep -q "window.Chart" && echo "OK: complete" || echo "FAIL: still truncated"
+```
+Apply the same size + end-signature pattern to any other downloaded library.
+
+#### 4.6. Syntax Gate (MANDATORY — parse JS/SVG, do not just grep)
+
+**Presence checks are not validity checks.** `grep -c '<svg'` passes on a dead diagram; grepping for the error banner passes on a `<script>` that never parses. Known incidents: an unbalanced `}` in a compressed `new Chart({…})` config made the whole `<script>` fail to parse (so the `typeof Chart` load-guard never ran), and shapes authored inside `<defs>` painted blank though the SVG was present. Both slip past grep-only validation.
+
+Run the syntax gate before considering any screen done. **This project ships no scripts — run the commands directly** (full platform-aware one-liners in `Shared Standards.md` → Runtime Environment Baseline → Syntax Gate; they detect the OS, prefer native, install user-level if missing, and honest-skip+warn otherwise). They verify, per file:
+- Every inline `<script>` block parses without executing — `osascript -l JavaScript` (macOS) or `node --check` (Linux/Windows/any) (catches unbalanced braces / unexpected tokens).
+- Every `<svg>` is well-formed (`xmllint --noout` or `python3`) AND has ≥1 shape element **outside** `<defs>` (catches blank diagrams).
+- Every `.json` manifest parses (`plutil -convert json` / `python3 -m json.tool` / `node` / `jq` — whichever is present).
+
+**A screen whose script does not parse is FAILED — regardless of whether the load-guard and error banner are present.** The load-guard protects against a *missing/truncated library*, not a *syntax error in your own code*: a parse error takes down the entire `<script>` block, guard included. Use the validator available on this machine (detect → prefer native → install user-level if missing) — never skip the check just because the macOS tool isn't present.
+
 #### 5. Logo & Brand Verification (if building for a known company)
 
 **a. Re-run the Logo Gate on the final embedded URL:**
@@ -1481,6 +1559,8 @@ After structural validation passes, assume the prototype has interactive bugs. Y
 
 **JavaScript Errors:**
 - Review every screen's `<script>` blocks for: undefined variables, event listeners on elements that might not exist, unscoped global variables that could conflict across screens
+- **First confirm every block parses** — run the JavaScriptCore syntax gate (`Shared Standards.md` → Syntax Gate). A syntax error (e.g. unbalanced brace in a Chart config) silently kills the whole `<script>`, including its load-guard; static review alone misses it.
+- **Ignore this benign warning:** `file:` URLs are treated as unique security origins is a normal `file://` local-file message, never the cause of a rendering bug — don't chase it.
 
 #### Fix Plan Format
 
@@ -1719,6 +1799,10 @@ Before completing, verify:
 - [ ] **All cross-screen links resolve** (no broken hrefs)
 - [ ] **Sidebar nav is consistent** across all screens (matches nav template)
 - [ ] **File sizes within budget** (see `Shared Standards.md`)
+- [ ] **Syntax gate passed** (run the `Shared Standards.md` → Syntax Gate commands: every `<script>` parses via JavaScriptCore, every `<svg>` well-formed with shapes outside `<defs>`, manifests valid — Step 9.5 check 4.6). A non-parsing script FAILS even if guards are present.
+- [ ] **Downloaded-asset integrity gate passed** (every `documents/lib/` file: size sane + end-of-file signature present via `tail`/`grep` — Step 9.5 check 4.5)
+- [ ] **Dependency-load guards present** (every screen using a downloaded lib guards with `if (typeof Chart === 'undefined')` → visible error)
+- [ ] **Global error banner present** on every screen (`window.addEventListener('error', …)`)
 - [ ] **Logo is the CUSTOMER's** (alt text matches customer name, same URL on all screens, URL domain is not a competitor's)
 
 ### Functional Quality (FULLY INTERACTIVE)

@@ -11,6 +11,7 @@
 
 # Development artifacts
 docs/superpowers/
+.superpowers/
 .claude/settings.local.json
 .claude/plans/
 .kiro/logs/
@@ -26,3 +27,6 @@ documents/*.html
 documents/*.json
 documents/*.md
 documents/handoffs/
+
+# Build-time fetched libraries (downloaded during Prototype phase, never committed)
+documents/lib/
