@@ -255,7 +255,7 @@ Search in this order — stop when you have a candidate:
 Before proceeding, verify:
 - [ ] File saved to `./documents/MarketResearch_[ProductName]_[YYYY-MM-DD].html`
 - [ ] **Quality gate passed:** 120+ sources (standard) or 150+ (comprehensive), 15+/20+ per dimension
-- [ ] All 6 dimensions researched (Industry, Competitive, Customer, Technology, Innovation, Policy/Risk/Opportunity)
+- [ ] All 6 dimensions researched (Industry, Competitive, Customer, Technology, Adjacent Innovation, Policy/Risk/Opportunity)
 - [ ] TAM/SAM/SOM includes actual dollar figures with cited sources
 - [ ] At least 5 competitors analyzed with real pricing data (fetched from their sites)
 - [ ] Pain points ranked by severity × frequency with source citations

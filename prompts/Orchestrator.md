@@ -31,7 +31,8 @@ You are a lightweight coordination agent responsible for routing tasks between s
 ┌─────────────────────────────────────────────────────────────────┐
 │                  DEEP RESEARCH AGENT                             │
 │  • 6 parallel research dimensions (8-12 searches each)          │
-│  • Industry, Competitive, Customer, Technology, Innovation      │
+│  • Industry, Competitive, Customer, Technology,                 │
+│    Adjacent Innovation, Policy/Risk/Opportunity                 │
 │  • Quality gate: 120+ sources (standard), 15+ per dimension     │
 │  • Consolidation: dedup, cross-ref, contradiction flagging      │
 │  OUTPUT: Deep Research Brief (HTML + handoff JSON)              │

@@ -35,7 +35,7 @@ All outputs are **standalone HTML files** that open directly in any browser - no
 ## Workflow Phases
 
 ### Phase 1: Deep Market Research
-- 6 parallel research dimensions (Industry, Competitive, Customer, Technology, Innovation, Policy/Regulatory)
+- 6 parallel research dimensions (Industry, Competitive, Customer, Technology, Adjacent Innovation, Policy/Risk/Opportunity)
 - 120+ sources minimum with quality gates
 - Market sizing (TAM/SAM/SOM with sources)
 - Customer pain points research
