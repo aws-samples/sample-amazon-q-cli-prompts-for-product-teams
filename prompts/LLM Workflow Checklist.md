@@ -33,7 +33,7 @@ This checklist provides step-by-step instructions for the independent product de
 **AI/ML Indicators:** ML models, AI capabilities, data prediction, NLP, computer vision, recommendations, automated decisions, pattern recognition, or generative AI features.
 
 **If AI/ML indicators are evident from the description:**
-- Proceed with Phase 0 (AI Framing) using `templates/ai_framing_template.md`
+- Proceed with Phase 0 (AI Framing) using `prompts/AI_Framing_Template.md`
 
 **If AI/ML indicators are unclear:**
 - Ask follow-up questions: "Based on your description, I want to clarify - will this product involve any machine learning, AI capabilities, data prediction, or automated decision-making features?"
@@ -128,7 +128,7 @@ Before advancing to next phase, verify:
 ## Phase 0: AI Framing (AI/ML Products Only)
 
 ### Step 0.1: Complete AI Framing Analysis
-**Template:** `templates/ai_framing_template.md`
+**Template:** `prompts/AI_Framing_Template.md`
 **LLM Instructions:**
 1. Ask user for AI/ML product concept (capabilities, data sources, business metrics)
 2. Work through template sections: Business Goals, ML Problem Framing, Data Strategy, Performance Metrics, Feasibility Assessment

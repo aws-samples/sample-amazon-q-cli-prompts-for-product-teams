@@ -5,4 +5,4 @@ description: Use when framing an AI/ML product as a machine learning problem —
 
 # AI Framing (AI/ML products only)
 
-Authoritative guide: `prompts/AI Framing Agent.md`; template: `templates/ai_framing_template.md`. Save `documents/AIFraming_[ProductSlug]_[YYYY-MM-DD].html`. Problem statement in "Given X, predict Y" form; metrics with thresholds mapped to business KPIs; structured summary handed to PRFAQ/PRD.
+Authoritative guide: `prompts/AI Framing Agent.md`; template: `prompts/AI_Framing_Template.md`. Save `documents/AIFraming_[ProductSlug]_[YYYY-MM-DD].html`. Problem statement in "Given X, predict Y" form; metrics with thresholds mapped to business KPIs; structured summary handed to PRFAQ/PRD.

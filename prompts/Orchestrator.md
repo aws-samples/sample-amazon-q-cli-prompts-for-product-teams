@@ -227,7 +227,7 @@ Invoke AI Framing Agent with:
 - Market context: {market_research_summary}
 
 Return structured AI Framing Summary per Handoff Schema.
-Use template: templates/ai_framing_template.md
+Use template: prompts/AI_Framing_Template.md
 ```
 
 ### PRFAQ Agent

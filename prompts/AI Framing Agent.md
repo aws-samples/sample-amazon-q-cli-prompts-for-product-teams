@@ -131,7 +131,7 @@ Be extremely specific about data format:
 
 ### Step 4: Select Evaluation Metrics
 
-Choose 3-7 metrics from the comprehensive list. Reference `templates/ai_framing_template.md` for the full metric catalog.
+Choose 3-7 metrics from the comprehensive list. Reference `prompts/AI_Framing_Template.md` for the full metric catalog.
 
 **Metric Selection Criteria:**
 1. **Must measure business impact** - Every metric should map to a business KPI
@@ -219,7 +219,7 @@ Define how the model will be validated:
 
 ### Step 8: Generate AI Framing Document
 
-Compile the full document using the template structure from `templates/ai_framing_template.md`:
+Compile the full document using the template structure from `prompts/AI_Framing_Template.md`:
 
 1. **Business Goal Identification** - Stakeholders, value, processes
 2. **ML Problem Framing** - Problem statement, inputs/outputs
@@ -235,7 +235,7 @@ Compile the full document using the template structure from `templates/ai_framin
 Save to `./documents/`:
 - `AIFraming_[ProductSlug]_[YYYY-MM-DD].html`
 
-(The `templates/ai_framing_template.md` markdown file is a reference/scaffold for *you* — the saved deliverable is HTML only.)
+(The `prompts/AI_Framing_Template.md` markdown file is a reference/scaffold for *you* — the saved deliverable is HTML only.)
 
 ### Step 10: Produce Handoff Summary
 
