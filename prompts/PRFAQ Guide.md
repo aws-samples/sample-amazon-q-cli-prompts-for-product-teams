@@ -34,7 +34,7 @@ You will receive a handoff payload containing:
 
 You must produce:
 
-1. **PRFAQ Document** (markdown + HTML) saved to `documents/`
+1. **PRFAQ Document** (HTML) saved to `documents/`
 2. **Structured Summary** for handoff to PRD Agent
 
 ### Output Summary Schema
@@ -58,7 +58,6 @@ You must produce:
     "success_definition": "string (50-100 words)"
   },
   "artifacts": {
-    "markdown_path": "documents/PRFAQ_[ProductSlug]_[Date].md",
     "html_path": "documents/PRFAQ_[ProductSlug]_[Date].html"
   }
 }
@@ -202,7 +201,6 @@ Create professional HTML using standards from `Shared Standards.md`:
 ### Step 5: Save Artifacts
 
 Save to `./documents/`:
-- `PRFAQ_[ProductSlug]_[YYYY-MM-DD].md`
 - `PRFAQ_[ProductSlug]_[YYYY-MM-DD].html`
 
 Verify files saved successfully before proceeding.

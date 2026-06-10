@@ -122,7 +122,7 @@ How would you like to proceed?
 
 Also, what level of research depth?
 - **Standard** (30-45 min) - 120+ sources across 6 dimensions [Default]
-- **Comprehensive** (60+ min) - 125+ sources with deeper analysis and multiple corroborating sources
+- **Comprehensive** (60+ min) - 150+ sources with deeper analysis and multiple corroborating sources
 ```
 
 ### Step 4: Initialize Session
@@ -140,7 +140,7 @@ Create session state:
     "website": "string | null",
     "industry": "string | null"
   },
-  "current_phase": "market-research",
+  "current_phase": "deep-research",
   "phases_completed": [],
   "created_at": "ISO timestamp"
 }
@@ -160,7 +160,7 @@ For each phase, you will:
 
 1. **Prepare Handoff Payload**
    - Extract relevant summary from previous phase output
-   - Include only essential context (see `Handoff Schema.md`)
+   - Include only essential context (see `Handoff Schema.md`; use the per-document condensing templates in `Document Summarizer.md` to keep each summary ~500 tokens)
    - Reference artifact paths, don't copy full content
 
 2. **Invoke Specialized Agent** (these are real subagents in `.claude/agents/`)
@@ -633,19 +633,25 @@ If handoff is missing required fields:
 
 **The dashboard is data-driven — regenerate it wholesale, never patch its structure.**
 
-The dashboard renders all phase rows from a single phase-state array:
+The dashboard renders every phase row and card from a single `CONFIG` object near the top of the file (see `ProjectDashboard_Template.html`):
 ```js
-const PHASES = [
-  { name: "Deep Market Research", status: "completed", doc: "MarketResearch_[Product]_[Date].html" },
-  { name: "PRFAQ",                status: "pending",   doc: null },
-  { name: "PRD",                  status: "pending",   doc: null },
-  { name: "Prototype",            status: "pending",   doc: null },
-];
+const CONFIG = {
+  product: "[ProductName]",
+  lastUpdated: "[LastUpdated]",
+  phases: [
+    { number: "01", title: "Market Research", description: "...",
+      cards: [ { title: "Research Brief", status: "pending",   // "completed" | "in-progress" | "pending"
+                 description: "...",
+                 actions: [ { label: "View Research", href: null, primary: true } ] } ] },
+    // ...PRFAQ, Requirements (PRD), Prototype phases follow the same shape.
+    // The Prototype "Screen Library" card uses `screens: [{ name, path }]` instead of `actions`.
+  ]
+};
 ```
 
-After each phase completion, **change one phase's `status`/`doc` value in the array and re-emit the entire dashboard file**. The progress bar %, status badges, and document links all derive from the array.
+After each phase completion, **set that phase's card `status` to `"completed"` and fill the action `href`(s) in `CONFIG`, then re-emit the entire dashboard file**. The progress bar %, status badges, and document links all derive from `CONFIG`.
 
-**NEVER apply chained string-replace edits to the dashboard's structural HTML** (phase rows, badges, links). In-place structural patching is what produced the orphaned `<div>` (unbalanced tag) in the post-mortem. When phases render from the array, a status update changes a data value only and cannot produce malformed markup. The template at `ProjectDashboard_Template.html` already renders from this array — copy it and edit the array; do not hand-edit its rows.
+**NEVER apply chained string-replace edits to the dashboard's structural HTML** (phase rows, badges, links). In-place structural patching is what produced the orphaned `<div>` (unbalanced tag) in the post-mortem. When phases render from `CONFIG`, a status update changes a data value only and cannot produce malformed markup. The template at `ProjectDashboard_Template.html` already renders from `CONFIG` — copy it and edit `CONFIG`; do not hand-edit its rows.
 
 ## What You Do NOT Do
 

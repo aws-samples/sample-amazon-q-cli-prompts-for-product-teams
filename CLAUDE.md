@@ -20,7 +20,7 @@ When the user describes a product idea or asks to start product development, fol
 **Project Dashboard — update after EVERY phase (MANDATORY, do not skip):**
 Create `documents/ProjectDashboard_[Product]_[YYYY-MM-DD].html` at the START (all phases "pending"), then after each phase completes:
 1. Save the phase document
-2. **Regenerate the dashboard wholesale** from its `PHASES` array — update that phase's `status` ("completed") and `doc` (the new filename); re-emit the whole file (progress %, timestamp, links all derive from the array). Never str-replace its structural HTML.
+2. **Regenerate the dashboard wholesale** from its `CONFIG` object — set that phase's card `status` to "completed" and fill its action `href`(s); re-emit the whole file (progress %, timestamp, links all derive from `CONFIG`). Never str-replace its structural HTML.
 3. `open ./documents/ProjectDashboard_[Product]_[YYYY-MM-DD].html`
 4. Tell the user: "Dashboard updated — [Phase] complete."
 
@@ -87,6 +87,7 @@ When building for a recognizable company (Discovery Education, Amazon, Google, e
 
 **ScreenIndex placeholders to replace:**
 `[PRODUCT_NAME]`, `[PRODUCT_SLUG]`, `[CUSTOMER_LOGO]`, `[BRAND_PRIMARY]`, `[BRAND_SECONDARY]`, `[BRAND_ACCENT]`, `[DATE]`, `[PROGRESS_PERCENT]`, `[SCREEN_COUNT]`, `[SCREEN_CARDS]`
+(Inside the `[SCREEN_CARDS]` example markup, each card has a per-card `[THUMBNAIL_URL]` — replace it with a real thumbnail or use the no-thumbnail `.screen-preview-placeholder` fallback the template shows. Never leave `[THUMBNAIL_URL]` literal.)
 
 **Fully interactive prototypes (REQUIRED):**
 - All buttons/links navigate to correct screens

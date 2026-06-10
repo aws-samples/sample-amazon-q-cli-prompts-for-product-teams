@@ -25,7 +25,7 @@ All inter-agent communications use this envelope structure:
   "product_name_slug": "string (underscores, no spaces)",
 
   "source_agent": {
-    "agent_type": "orchestrator | market-research | prfaq | prd | prototype-spec | prototype | ai-framing",
+    "agent_type": "orchestrator | deep-research | prfaq | prd | prototype-spec | prototype | ai-framing",
     "phase_completed": "string",
     "execution_time_ms": "number"
   },

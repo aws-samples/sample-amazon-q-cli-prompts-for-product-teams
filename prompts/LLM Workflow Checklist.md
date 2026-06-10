@@ -1,18 +1,15 @@
 # LLM Workflow Checklist: Independent Product Development Process
 
-> **NEW: Multi-Agent Architecture Available**
+> # ⛔ DEPRECATED — DO NOT FOLLOW THIS FILE
+> #
+> **This is a stale single-agent checklist that contradicts the current workflow.** It runs AI Framing as "Phase 0" *before* market research, mandates markdown+HTML outputs, and omits web-based deep research — all of which the live workflow has since changed.
 >
-> This toolkit now supports a **multi-agent architecture** for modern AI CLI tools (Kiro-cli, Claude Code). The multi-agent approach provides:
-> - **Protected context windows** - Each agent receives only what it needs
-> - **Web-enabled market research** - Dedicated agent for competitive analysis
-> - **Better quality** - Specialized agents focus on their domain
-> - **Resumable workflows** - Session state enables pause/resume
+> **For Claude Code / Cursor:** follow `prompts/Claude_Code_Workflow.md` and `prompts/Orchestrator.md`.
+> **For Kiro:** the `.kiro/steering/*.md` files load automatically.
 >
-> **To use multi-agent mode:** Load `prompts/Orchestrator.md` instead of this file.
+> The current order is: **Deep Market Research → AI Framing (1b, optional) → PRFAQ → PRD → Prototype**, all output as **HTML** (no markdown deliverables).
 >
-> **This file (Legacy Mode)** remains available for single-agent tools or simpler workflows. It works the same as before but doesn't include web-based market research.
->
-> See `README.md` for full architecture documentation.
+> This file is retained only for historical reference. Do not load it during a build.
 
 ---
 

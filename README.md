@@ -165,6 +165,8 @@ samples/                        (example outputs for reference)
 
 ## Agent Hooks
 
+> These hooks are **Kiro mode only**. Claude Code's automated gating is narrower — `.claude/settings.json` runs an advisory JS-syntax gate on `Screen_*.html` and an SVG paint check on `PRD_*.html`; everything else below is enforced by the agent via the prose guides rather than a save-triggered hook. See *Native Claude Code primitives*.
+
 `.kiro/hooks.json` defines **16 hooks** in three groups:
 
 **Automatic validators (trigger on file save):**

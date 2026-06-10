@@ -29,7 +29,7 @@ You will receive a handoff payload containing:
 
 You must produce:
 
-1. **AI Framing Document** (markdown + HTML) saved to `documents/`
+1. **AI Framing Document** (HTML) saved to `documents/`
 2. **Structured Summary** for handoff to PRFAQ and PRD agents
 
 ### Output Summary Schema
@@ -71,7 +71,6 @@ You must produce:
     }
   },
   "artifacts": {
-    "markdown_path": "documents/AIFraming_[ProductSlug]_[Date].md",
     "html_path": "documents/AIFraming_[ProductSlug]_[Date].html"
   }
 }
@@ -234,8 +233,9 @@ Compile the full document using the template structure from `templates/ai_framin
 ### Step 9: Save Artifacts
 
 Save to `./documents/`:
-- `AIFraming_[ProductSlug]_[YYYY-MM-DD].md`
 - `AIFraming_[ProductSlug]_[YYYY-MM-DD].html`
+
+(The `templates/ai_framing_template.md` markdown file is a reference/scaffold for *you* — the saved deliverable is HTML only.)
 
 ### Step 10: Produce Handoff Summary
 

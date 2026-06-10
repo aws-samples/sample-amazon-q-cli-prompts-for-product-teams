@@ -37,7 +37,7 @@ You will receive a handoff payload containing:
 
 You must produce:
 
-1. **PRD Document** (markdown + HTML) saved to `documents/`
+1. **PRD Document** (HTML) saved to `documents/`
 2. **Design System** (HTML) if not already created
 3. **Structured Summary** for handoff to Prototype Agent
 
@@ -89,9 +89,9 @@ You must produce:
     "screens_identified": ["string (screen names for prototype)"]
   },
   "artifacts": {
-    "markdown_path": "documents/PRD_[ProductSlug]_[Date].md",
     "html_path": "documents/PRD_[ProductSlug]_[Date].html",
-    "design_system_path": "documents/DesignSystem_[ProductSlug]_[Date].html"
+    "design_system_path": "documents/DesignSystem_[ProductSlug]_[Date].html",
+    "kiro_spec_path": ".kiro/specs/[product-slug]/requirements.md"
   }
 }
 ```
@@ -171,8 +171,8 @@ Document for each product feature:
   "build_stack": [
     {
       "category": "string (e.g., 'AI/ML', 'Database', 'Frontend')",
-      "recommendation": "string (e.g., 'Amazon Bedrock with Claude 4 Sonnet')",
-      "version": "string (e.g., 'claude-sonnet-4-6-20250514')",
+      "recommendation": "string (e.g., 'Amazon Bedrock with the latest Claude model')",
+      "version": "string — ILLUSTRATIVE ONLY: look up the current model ID in Step 1's technology research; do NOT paste this placeholder. Model IDs change frequently.",
       "rationale": "string (why this choice for this product)",
       "source_url": "string (documentation or announcement link)"
     }
@@ -492,9 +492,10 @@ Every PRD MUST include an inline SVG architecture diagram in the Technical Archi
 ### Step 11: Save Artifacts
 
 Save to `./documents/`:
-- `PRD_[ProductSlug]_[YYYY-MM-DD].md`
 - `PRD_[ProductSlug]_[YYYY-MM-DD].html`
 - `DesignSystem_[ProductSlug]_[YYYY-MM-DD].html` (if created)
+
+The Kiro spec `requirements.md` (in `.kiro/specs/[product-slug]/`) is the one markdown artifact — it is a machine-consumed spec, not the human-facing deliverable.
 
 ### Step 12: Produce Handoff Summary
 

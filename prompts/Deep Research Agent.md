@@ -456,7 +456,7 @@ Prioritize recency (prefer sources from the last 2 years). Prioritize specificit
 
 ### Comprehensive (60+ minutes)
 - 12-16 searches per dimension
-- 20+ sources per dimension (125+ total)
+- 20+ sources per dimension (150+ total)
 - 7+ competitors including indirect
 - Market sizing with multiple corroborating sources
 - Customer research with sentiment analysis

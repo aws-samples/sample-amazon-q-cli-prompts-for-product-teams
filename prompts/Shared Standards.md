@@ -74,9 +74,9 @@ else echo "⚠ JSON validation SKIPPED: install python3, node, or jq"; fi
 | Document Type | Example |
 |--------------|---------|
 | Market Research | `MarketResearch_TeenFit_[YYYY-MM-DD].html` |
-| AI Framing | `AIFraming_TeenFit_[YYYY-MM-DD].md` |
-| PRFAQ | `PRFAQ_TeenFit_[YYYY-MM-DD].md` |
-| PRD | `PRD_TeenFit_[YYYY-MM-DD].md` |
+| AI Framing | `AIFraming_TeenFit_[YYYY-MM-DD].html` |
+| PRFAQ | `PRFAQ_TeenFit_[YYYY-MM-DD].html` |
+| PRD | `PRD_TeenFit_[YYYY-MM-DD].html` |
 | Shared CSS | `teenfit.css` (`.css` extension, no date — stable filename) |
 | Design System Reference | `DesignSystem_TeenFit_[YYYY-MM-DD].html` (visual docs only) |
 | Prototype Spec | `PrototypeSpec_TeenFit_[YYYY-MM-DD].html` |
@@ -362,11 +362,11 @@ Before completing any phase output, verify:
 ### File Quality
 - [ ] File saved to correct location (`./documents/`)
 - [ ] File naming convention followed exactly
-- [ ] Both markdown and HTML versions created (where applicable)
+- [ ] Human-facing deliverable saved as HTML (not markdown). Markdown is only for machine/intermediate artifacts (e.g. the Kiro spec `requirements.md`/`design.md`, handoff payloads)
 - [ ] HTML is valid and renders correctly
 - [ ] All internal links work
 - [ ] For prototype screens: shared `.css` linked (not inlined), file size within budget (see Performance Guidelines)
-- [ ] For prototype phase: post-build validation passed (see Step 8.5 in `Prototype Creation Guide.md`)
+- [ ] For prototype phase: post-build validation passed (see Step 9.5 in `Prototype Creation Guide.md`)
 
 ### Handoff Quality
 - [ ] Output structured per Handoff Schema
