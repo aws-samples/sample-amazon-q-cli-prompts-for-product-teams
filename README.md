@@ -118,14 +118,14 @@ CLAUDE.md                       (auto-loads in Claude Code)
 prompts/                        (Claude Code / Cursor workflow — single source of truth for both modes)
 ├── Claude_Code_Workflow.md     (main workflow guide)
 ├── Orchestrator.md             (coordination + per-phase agent dispatch)
-├── Shared Standards.md         (runtime baseline, syntax gate, file naming, budgets)
-├── Deep Research Agent.md      (6 parallel dimensions, quality gates)
-├── AI Framing Agent.md         (AI/ML products only)
-├── PRFAQ Guide.md
-├── PRD Creation Guide.md       (includes Technology Research)
-├── Prototype Spec Guide.md     (interaction blueprint)
-├── Prototype Creation Guide.md
-├── Handoff Schema.md           (inter-phase payload contract)
+├── Shared_Standards.md         (runtime baseline, syntax gate, file naming, budgets)
+├── Deep_Research_Agent.md      (6 parallel dimensions, quality gates)
+├── AI_Framing_Agent.md         (AI/ML products only)
+├── PRFAQ_Guide.md
+├── PRD_Creation_Guide.md       (includes Technology Research)
+├── Prototype_Spec_Guide.md     (interaction blueprint)
+├── Prototype_Creation_Guide.md
+├── Handoff_Schema.md           (inter-phase payload contract)
 └── ProjectDashboard_Template.html / ScreenIndex_Template.html
 
 .claude/                        (native Claude Code layer — thin shims over prompts/)

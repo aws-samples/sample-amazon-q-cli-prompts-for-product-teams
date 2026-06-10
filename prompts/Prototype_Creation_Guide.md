@@ -499,7 +499,7 @@ Before building any screens, commit to a **bold, intentional aesthetic direction
 - Break grids intentionally—asymmetry, overlap, diagonal flow
 - Customize every component to match your aesthetic
 - Create visual hierarchy through bold contrast
-- **Icons:** prefer hand-authored inline `<svg>` (offline-safe, fully styleable). An icon-font CDN (Font Awesome, Material Symbols) is an acceptable fallback only — see `Shared Standards.md` → Runtime Environment Baseline for the CDN rule (style resources OK; never a CDN `<script>`).
+- **Icons:** prefer hand-authored inline `<svg>` (offline-safe, fully styleable). An icon-font CDN (Font Awesome, Material Symbols) is an acceptable fallback only — see `Shared_Standards.md` → Runtime Environment Baseline for the CDN rule (style resources OK; never a CDN `<script>`).
 
 ### Step 3: Map User Flows
 
@@ -822,7 +822,7 @@ This is a one-time *build-time download* into a local file — NOT a runtime CDN
 - **Loaded:** The chart with realistic data
 
 **MANDATORY — Dependency-load guard (fail visibly, never silently):**
-The target machine is a stock Mac without admin or devtools (see `Shared Standards.md` → Runtime Environment Baseline). If `lib/chart.min.js` is missing or truncated, the screen must show a visible error, NOT a blank card. Guard every use of the library:
+The target machine is a stock Mac without admin or devtools (see `Shared_Standards.md` → Runtime Environment Baseline). If `lib/chart.min.js` is missing or truncated, the screen must show a visible error, NOT a blank card. Guard every use of the library:
 ```html
 <script src="lib/chart.min.js"></script>
 <script>
@@ -1315,7 +1315,7 @@ After all screens are created, run these checks. **Fix any issues before showing
 - Verify each screen's sidebar matches the nav template (only the `active` class should differ)
 
 #### 4. File Size Check
-- Check file sizes against the budget in `Shared Standards.md`:
+- Check file sizes against the budget in `Shared_Standards.md`:
   - Shared CSS: < 20KB
   - Screen HTML: < 25KB
   - ClickablePrototype: < 300KB
@@ -1346,7 +1346,7 @@ Apply the same size + end-signature pattern to any other downloaded library.
 
 **Presence checks are not validity checks.** `grep -c '<svg'` passes on a dead diagram; grepping for the error banner passes on a `<script>` that never parses. Known incidents: an unbalanced `}` in a compressed `new Chart({…})` config made the whole `<script>` fail to parse (so the `typeof Chart` load-guard never ran), and shapes authored inside `<defs>` painted blank though the SVG was present. Both slip past grep-only validation.
 
-Run the syntax gate before considering any screen done. **This project ships no scripts — run the commands directly** (full platform-aware one-liners in `Shared Standards.md` → Runtime Environment Baseline → Syntax Gate; they detect the OS, prefer native, install user-level if missing, and honest-skip+warn otherwise). They verify, per file:
+Run the syntax gate before considering any screen done. **This project ships no scripts — run the commands directly** (full platform-aware one-liners in `Shared_Standards.md` → Runtime Environment Baseline → Syntax Gate; they detect the OS, prefer native, install user-level if missing, and honest-skip+warn otherwise). They verify, per file:
 - Every inline `<script>` block parses without executing — `osascript -l JavaScript` (macOS) or `node --check` (Linux/Windows/any) (catches unbalanced braces / unexpected tokens).
 - Every `<svg>` is well-formed (`xmllint --noout` or `python3`) AND has ≥1 shape element **outside** `<defs>` (catches blank diagrams).
 - Every `.json` manifest parses (`plutil -convert json` / `python3 -m json.tool` / `node` / `jq` — whichever is present).
@@ -1386,7 +1386,7 @@ If check 4 fails — the image shows a different company, a partner logo, a gene
 - Verify at least one modal opens and closes
 - Verify at least one form shows feedback on submit
 
-**This is the authoritative quality gate for prototypes.** Other quality checklists in this file and in `Shared Standards.md` cover design and functional quality; this step covers structural integrity.
+**This is the authoritative quality gate for prototypes.** Other quality checklists in this file and in `Shared_Standards.md` cover design and functional quality; this step covers structural integrity.
 
 #### 7. Visual Consistency Check (Theme Coherence)
 
@@ -1559,7 +1559,7 @@ After structural validation passes, assume the prototype has interactive bugs. Y
 
 **JavaScript Errors:**
 - Review every screen's `<script>` blocks for: undefined variables, event listeners on elements that might not exist, unscoped global variables that could conflict across screens
-- **First confirm every block parses** — run the JavaScriptCore syntax gate (`Shared Standards.md` → Syntax Gate). A syntax error (e.g. unbalanced brace in a Chart config) silently kills the whole `<script>`, including its load-guard; static review alone misses it.
+- **First confirm every block parses** — run the JavaScriptCore syntax gate (`Shared_Standards.md` → Syntax Gate). A syntax error (e.g. unbalanced brace in a Chart config) silently kills the whole `<script>`, including its load-guard; static review alone misses it.
 - **Ignore this benign warning:** `file:` URLs are treated as unique security origins is a normal `file://` local-file message, never the cause of a rendering bug — don't chase it.
 
 #### Fix Plan Format
@@ -1798,8 +1798,8 @@ Before completing, verify:
 - [ ] **Screen manifest filenames match** actual files in `./documents/`
 - [ ] **All cross-screen links resolve** (no broken hrefs)
 - [ ] **Sidebar nav is consistent** across all screens (matches nav template)
-- [ ] **File sizes within budget** (see `Shared Standards.md`)
-- [ ] **Syntax gate passed** (run the `Shared Standards.md` → Syntax Gate commands: every `<script>` parses via JavaScriptCore, every `<svg>` well-formed with shapes outside `<defs>`, manifests valid — Step 9.5 check 4.6). A non-parsing script FAILS even if guards are present.
+- [ ] **File sizes within budget** (see `Shared_Standards.md`)
+- [ ] **Syntax gate passed** (run the `Shared_Standards.md` → Syntax Gate commands: every `<script>` parses via JavaScriptCore, every `<svg>` well-formed with shapes outside `<defs>`, manifests valid — Step 9.5 check 4.6). A non-parsing script FAILS even if guards are present.
 - [ ] **Downloaded-asset integrity gate passed** (every `documents/lib/` file: size sane + end-of-file signature present via `tail`/`grep` — Step 9.5 check 4.5)
 - [ ] **Dependency-load guards present** (every screen using a downloaded lib guards with `if (typeof Chart === 'undefined')` → visible error)
 - [ ] **Global error banner present** on every screen (`window.addEventListener('error', …)`)

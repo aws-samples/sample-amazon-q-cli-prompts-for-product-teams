@@ -13,7 +13,7 @@ This document contains standards and conventions that ALL specialized agents mus
 2. **If none can do the check, install one** — try non-admin methods first (`npm i -g --prefix ~/.local`, `npx`, `pip install --user`). **If only an admin/system install would work (sudo, system brew/apt/winget), ASK the user first. Never silently run `sudo`.**
 3. **If no validator is available and install is declined/fails, WARN and continue** — state exactly what was skipped and why (e.g. `⚠ JS syntax gate SKIPPED: no JS parser (tried osascript, node)`). Never report a skipped check as "passed."
 
-**This project ships NO code.** It is a steering/prompt repo — no scripts, no helper binaries, no bundled libraries are committed. Do not create a `scripts/` directory or commit any `.sh`/`.js` tool. Run validation as ad-hoc commands you type directly (below). Any library a prototype needs is **downloaded at build time** into the gitignored `documents/lib/`, never committed (see `Prototype Creation Guide.md` → Data Visualization).
+**This project ships NO code.** It is a steering/prompt repo — no scripts, no helper binaries, no bundled libraries are committed. Do not create a `scripts/` directory or commit any `.sh`/`.js` tool. Run validation as ad-hoc commands you type directly (below). Any library a prototype needs is **downloaded at build time** into the gitignored `documents/lib/`, never committed (see `Prototype_Creation_Guide.md` → Data Visualization).
 
 **Serve locally → the rule is about REMOTE EXECUTABLE CODE, not all network requests.** Prototypes open from the local filesystem, so the line is:
 
@@ -24,7 +24,7 @@ This document contains standards and conventions that ALL specialized agents mus
 Note: a `w3.org` URL in an SVG (`xmlns="http://www.w3.org/2000/svg"`) is a **namespace identifier, not a network fetch** — nothing downloads it. Never flag, rewrite, or "localize" it.
 
 **What this means for verification:**
-- Every validation step must run with whatever validator the machine has, OR be **baked into the generated artifacts** (dependency-load guards + a global error banner — see `Prototype Creation Guide.md`; these are the cross-platform safety net, surfacing failures in any browser regardless of validator availability).
+- Every validation step must run with whatever validator the machine has, OR be **baked into the generated artifacts** (dependency-load guards + a global error banner — see `Prototype_Creation_Guide.md`; these are the cross-platform safety net, surfacing failures in any browser regardless of validator availability).
 - You cannot run the app in a JS runtime or render it in headless Chrome to confirm it works. A "real render" means the user opening the file in their browser — which only helps if the artifact fails *visibly* rather than silently.
 - Build-time-downloaded libraries (e.g. a fetched `documents/lib/chart.min.js`) must be integrity-checked with `wc`/`tail`/`grep` (present on every platform), never trusted blindly.
 
@@ -107,7 +107,7 @@ project_root/
 
 ### Local Libraries (downloaded at build time — never committed)
 
-This repo ships no libraries. When a prototype needs one, download it into the gitignored `documents/lib/` during the Prototype phase, then run the integrity gate (`Prototype Creation Guide.md` Step 9.5 check 4.5).
+This repo ships no libraries. When a prototype needs one, download it into the gitignored `documents/lib/` during the Prototype phase, then run the integrity gate (`Prototype_Creation_Guide.md` Step 9.5 check 4.5).
 
 | Library | Download (build time) | Local reference in screens |
 |---------|----------------------|----------------------------|
@@ -366,7 +366,7 @@ Before completing any phase output, verify:
 - [ ] HTML is valid and renders correctly
 - [ ] All internal links work
 - [ ] For prototype screens: shared `.css` linked (not inlined), file size within budget (see Performance Guidelines)
-- [ ] For prototype phase: post-build validation passed (see Step 9.5 in `Prototype Creation Guide.md`)
+- [ ] For prototype phase: post-build validation passed (see Step 9.5 in `Prototype_Creation_Guide.md`)
 
 ### Handoff Quality
 - [ ] Output structured per Handoff Schema

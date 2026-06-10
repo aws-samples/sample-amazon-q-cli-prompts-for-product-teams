@@ -24,15 +24,15 @@ Discovery → Deep Market Research → [AI Framing] → PRFAQ → PRD → Protot
 
 | Phase | Output | Guide to Load |
 |-------|--------|---------------|
-| 1 | Deep Market Research (6 dimensions, 120+ sources) | `Deep Research Agent.md` |
-| 1b | AI Framing (ML products only) | `AI Framing Agent.md` |
-| 2 | PRFAQ | `PRFAQ Guide.md` |
-| 3 | PRD | `PRD Creation Guide.md` |
-| 4 | Prototype | `Prototype Creation Guide.md` |
+| 1 | Deep Market Research (6 dimensions, 120+ sources) | `Deep_Research_Agent.md` |
+| 1b | AI Framing (ML products only) | `AI_Framing_Agent.md` |
+| 2 | PRFAQ | `PRFAQ_Guide.md` |
+| 3 | PRD | `PRD_Creation_Guide.md` |
+| 4 | Prototype | `Prototype_Creation_Guide.md` |
 
 **Internal sub-steps (not user-visible phases):**
-- Technology Research runs inside Phase 3 (PRD) — see `PRD Creation Guide.md` Step 1.5
-- Prototype Spec runs at the start of Phase 4 (Prototype) — see `Prototype Spec Guide.md`
+- Technology Research runs inside Phase 3 (PRD) — see `PRD_Creation_Guide.md` Step 1.5
+- Prototype Spec runs at the start of Phase 4 (Prototype) — see `Prototype_Spec_Guide.md`
 
 **All outputs:** Standalone HTML files saved to `./documents/`
 
@@ -82,7 +82,7 @@ After gathering the user's answers and informing them of the mode, proceed direc
 
 ### Phase 1: Deep Research
 
-**Load:** `prompts/Deep Research Agent.md`
+**Load:** `prompts/Deep_Research_Agent.md`
 
 > **Important:** Use web search to find real data. Don't make up statistics. This phase conducts rigorous multi-dimensional research across 6 parallel tracks.
 
@@ -130,7 +130,7 @@ After gathering the user's answers and informing them of the mode, proceed direc
 
 ### Phase 1b: AI Framing (AI/ML Products Only)
 
-**Load:** `prompts/AI Framing Agent.md`
+**Load:** `prompts/AI_Framing_Agent.md`
 
 **Create:**
 1. Business goals and ML problem framing
@@ -156,7 +156,7 @@ After gathering the user's answers and informing them of the mode, proceed direc
 
 ### Phase 2: PRFAQ
 
-**Load:** `prompts/PRFAQ Guide.md`
+**Load:** `prompts/PRFAQ_Guide.md`
 
 **Step 0: Challenge Check (internal — do not present as separate step to user)**
 Before writing the PRFAQ, critically examine the research inputs. Ask yourself:
@@ -195,7 +195,7 @@ Use findings to strengthen the PRFAQ — make the problem statement more defensi
 
 ### Phase 3: PRD
 
-**Load:** `prompts/PRD Creation Guide.md`
+**Load:** `prompts/PRD_Creation_Guide.md`
 
 **Step 0: Challenge Check (internal — do not present as separate step to user)**
 Before writing the PRD, critically examine the PRFAQ and research inputs. Ask yourself:
@@ -249,7 +249,7 @@ Use findings to identify requirements gaps, tighten acceptance criteria, and ens
 
 ### Phase 4: Prototype
 
-**Load:** `prompts/Prototype Creation Guide.md`
+**Load:** `prompts/Prototype_Creation_Guide.md`
 
 **Step 0a: Challenge Check (internal — do not present as separate step to user)**
 Before building the prototype, critically examine the PRD. Ask yourself:
@@ -262,7 +262,7 @@ Before building the prototype, critically examine the PRD. Ask yourself:
 Use findings to focus the prototype on what actually matters — cut screens that don't validate the core hypothesis, add edge cases to flows that feel fragile.
 
 **Step 0b: Generate Prototype Spec (internal — do NOT present to user as a separate phase):**
-Generate the Prototype Spec by loading `prompts/Prototype Spec Guide.md` and creating `documents/PrototypeSpec_[Product]_[YYYY-MM-DD].html`. This defines screen interactions, user flows, component behaviors, and state definitions. Use it to guide all screen building. Do NOT pause for user approval on the spec — proceed directly to building the prototype.
+Generate the Prototype Spec by loading `prompts/Prototype_Spec_Guide.md` and creating `documents/PrototypeSpec_[Product]_[YYYY-MM-DD].html`. This defines screen interactions, user flows, component behaviors, and state definitions. Use it to guide all screen building. Do NOT pause for user approval on the spec — proceed directly to building the prototype.
 
 **Create from PRD + Prototype Spec (modular structure required):**
 1. **Shared CSS file first** - `[product-slug].css` with design tokens and components (`.css` extension REQUIRED — browsers reject `.html` loaded as stylesheets)
@@ -409,7 +409,7 @@ documents/
 - [ ] Navigation between all screens works
 - [ ] Data consistent across screens
 - [ ] **No AI slop** (see Design Standards)
-- [ ] **Post-build validation passed** (see `Prototype Creation Guide.md`)
+- [ ] **Post-build validation passed** (see `Prototype_Creation_Guide.md`)
 
 ---
 
@@ -520,10 +520,10 @@ When the user provides additional context (CSV files, company docs, team info):
 - All screens from PRD implemented
 - Navigation works between all screens (verified by post-build link audit)
 - No AI slop aesthetics
-- Syntax gate passed (run the `Shared Standards.md` → Syntax Gate commands: every `<script>` parses via JavaScriptCore, every `<svg>` well-formed with shapes outside `<defs>`, manifests valid — see `Prototype Creation Guide.md` Step 9.5 check 4.6)
-- Downloaded-asset integrity gate passed (every `documents/lib/` file: size sane + end-of-file signature via `tail`/`grep` — see `Prototype Creation Guide.md` Step 9.5 check 4.5)
+- Syntax gate passed (run the `Shared_Standards.md` → Syntax Gate commands: every `<script>` parses via JavaScriptCore, every `<svg>` well-formed with shapes outside `<defs>`, manifests valid — see `Prototype_Creation_Guide.md` Step 9.5 check 4.6)
+- Downloaded-asset integrity gate passed (every `documents/lib/` file: size sane + end-of-file signature via `tail`/`grep` — see `Prototype_Creation_Guide.md` Step 9.5 check 4.5)
 - Dependency-load guards + global error banner present on every screen (so failures surface visibly on a stock Mac)
-- Post-build validation passed (see `Prototype Creation Guide.md`)
+- Post-build validation passed (see `Prototype_Creation_Guide.md`)
 
 **Honest validation gating:** Grep presence-checks prove structure exists, not that code parses or paints. The syntax gate MUST pass first — a `<script>` that doesn't parse never runs its guard, so guards never excuse a parse error. On top of a passing syntax gate, do NOT report the prototype as "validated" unless either (a) the dependency-load guards + global error banner are in place (any *runtime* failure surfaces visibly in the browser), or (b) a real render was confirmed (user opened it and reported). Always state what was verified vs. assumed — e.g. "Syntax gate + static checks passed; runtime not executed, but graceful-degradation guards are in place."
 

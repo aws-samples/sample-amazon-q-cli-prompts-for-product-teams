@@ -9,5 +9,5 @@ You are the PRODUCT REVIEWER. You run ONE review lens at a time, named in your p
 
 ## Non-negotiables
 1. Report findings with specific file:element references and concrete fixes — do not fix unless asked.
-2. For interactivity/link audits, run the syntax gate + dead-link greps from `prompts/Prototype Creation Guide.md` Step 9.5.
+2. For interactivity/link audits, run the syntax gate + dead-link greps from `prompts/Prototype_Creation_Guide.md` Step 9.5.
 3. Where a lens produces a document, save to `documents/[Lens]_[Product]_[YYYY-MM-DD].html`.

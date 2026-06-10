@@ -192,7 +192,7 @@ _Press Release and Frequently Asked Questions_
 
 ### Step 4: Generate HTML Version
 
-Create professional HTML using standards from `Shared Standards.md`:
+Create professional HTML using standards from `Shared_Standards.md`:
 - Clean, readable typography
 - Proper heading hierarchy
 - Print-friendly styling

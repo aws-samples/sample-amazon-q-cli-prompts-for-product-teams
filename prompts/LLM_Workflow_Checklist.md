@@ -146,7 +146,7 @@ Before advancing to next phase, verify:
 ## Phase 1: PRFAQ Creation
 
 ### Step 1: Initialize PRFAQ Process
-**Prompt to Use:** `PRFAQ Guide.md`
+**Prompt to Use:** `PRFAQ_Guide.md`
 **Input Required:** Product idea or concept (+ AI Framing document if AI/ML product)
 **LLM Instructions:**
 1. Load the PRFAQ Guide prompt
@@ -210,7 +210,7 @@ Before advancing to next phase, verify:
 ## Phase 2: PRD Creation
 
 ### Step 5: Initialize PRD Process
-**Prompt to Use:** `PRD Creation Guide.md`
+**Prompt to Use:** `PRD_Creation_Guide.md`
 **Input Required:** Approved PRFAQ document from Phase 1 (+ AI Framing document if AI/ML product)
 **LLM Instructions:**
 1. Load the PRD Creation Guide prompt
@@ -281,7 +281,7 @@ Before advancing to next phase, verify:
 ## Phase 3: Prototype Creation
 
 ### Step 8: Initialize Prototype Process
-**Prompt to Use:** `Prototype Creation Guide.md`
+**Prompt to Use:** `Prototype_Creation_Guide.md`
 **Input Required:** Approved PRD document from Phase 2
 **LLM Instructions:**
 1. Load the Prototype Creation Guide prompt

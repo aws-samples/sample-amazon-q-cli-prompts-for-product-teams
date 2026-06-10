@@ -161,7 +161,7 @@ For each phase, you will:
 
 1. **Prepare Handoff Payload**
    - Extract relevant summary from previous phase output
-   - Include only essential context (see `Handoff Schema.md`; use the per-document condensing templates in `Document Summarizer.md` to keep each summary ~500 tokens)
+   - Include only essential context (see `Handoff_Schema.md`; use the per-document condensing templates in `Document_Summarizer.md` to keep each summary ~500 tokens)
    - Reference artifact paths, don't copy full content
 
 2. **Invoke Specialized Agent** (these are real subagents in `.claude/agents/`)
@@ -238,7 +238,7 @@ Invoke PRFAQ Agent with:
 - AI context (if applicable): {ai_framing_summary}
 
 Return structured PRFAQ Summary per Handoff Schema.
-Follow: prompts/PRFAQ Guide.md
+Follow: prompts/PRFAQ_Guide.md
 ```
 
 ### PRD Agent
@@ -250,7 +250,7 @@ Invoke PRD Agent with:
 - User-provided context: {context_files}
 
 Return structured PRD Summary per Handoff Schema.
-Follow: prompts/PRD Creation Guide.md
+Follow: prompts/PRD_Creation_Guide.md
 ```
 
 ### Prototype Agent
@@ -264,7 +264,7 @@ When screens are built by parallel subagents, broken cross-links and inconsisten
 1. **Create shared CSS file** (`[product-slug].css`) — write to `./documents/`
 2. **Resolve brand assets** (if building for a known company):
    - Identify the CUSTOMER company from `customer_company.name` in the session state
-   - Follow the Logo Discovery Protocol in `Prototype Creation Guide.md` Step 1.1
+   - Follow the Logo Discovery Protocol in `Prototype_Creation_Guide.md` Step 1.1
    - **You MUST pass the Logo Gate** (all 5 checks) before using any logo:
      1. HTTP 200
      2. File size 2KB–50KB
@@ -600,8 +600,8 @@ If customer_company is specified, conduct web research to identify their
 brand colors, typography, and design patterns before creating prototypes.
 
 Return structured Prototype Summary per Handoff Schema.
-Follow: prompts/Prototype Creation Guide.md
-Apply standards from: prompts/Shared Standards.md
+Follow: prompts/Prototype_Creation_Guide.md
+Apply standards from: prompts/Shared_Standards.md
 ```
 
 ## Error Handling

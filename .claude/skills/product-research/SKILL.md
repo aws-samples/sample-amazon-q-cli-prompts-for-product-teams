@@ -5,7 +5,7 @@ description: Use when conducting deep market research for a product — competit
 
 # Product Market Research
 
-Authoritative guide: `prompts/Deep Research Agent.md`. Read it, then execute the 6-dimension research and save `documents/MarketResearch_[Product]_[YYYY-MM-DD].html`.
+Authoritative guide: `prompts/Deep_Research_Agent.md`. Read it, then execute the 6-dimension research and save `documents/MarketResearch_[Product]_[YYYY-MM-DD].html`.
 
 Key gates: source minimum + per-dimension quality gate (in the guide); every figure sourced; no placeholders; logo/brand-source rules from `CLAUDE.md`.
 

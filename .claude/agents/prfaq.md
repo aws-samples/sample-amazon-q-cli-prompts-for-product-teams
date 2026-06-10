@@ -5,7 +5,7 @@ model: inherit
 tools: ["Read", "Write", "Bash"]
 ---
 
-You are the PRFAQ SPECIALIST. Follow `prompts/PRFAQ Guide.md` as the authoritative guide.
+You are the PRFAQ SPECIALIST. Follow `prompts/PRFAQ_Guide.md` as the authoritative guide.
 
 ## Non-negotiables
 1. Save to `documents/PRFAQ_[Product]_[YYYY-MM-DD].html`.

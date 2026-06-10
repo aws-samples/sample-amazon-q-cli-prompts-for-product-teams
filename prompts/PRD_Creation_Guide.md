@@ -374,7 +374,7 @@ Based on requirements and personas, list all screens needed:
 ### Step 9: Create Design System (if not exists)
 
 If no design system exists, create `DesignSystem_[ProductSlug]_[Date].html` with:
-- Color palette (use defaults from `Shared Standards.md` unless brand provided)
+- Color palette (use defaults from `Shared_Standards.md` unless brand provided)
 - Typography scale
 - Component library (buttons, forms, cards, navigation)
 - Spacing system
@@ -487,7 +487,7 @@ Every PRD MUST include an inline SVG architecture diagram in the Technical Archi
 **`<defs>` discipline (prevents a blank diagram):**
 - `<defs>` holds ONLY definitions — `<marker>`, `<linearGradient>`, `<filter>`, `<style>`, `<symbol>`. It is never painted.
 - **Every rendered shape (`<rect>`, `<text>`, `<path>`, `<line>`, `<circle>`, `<g>`) MUST come AFTER `</defs>`** — exactly as in the pattern above. A shape left inside `<defs>`, or a `<defs>` you forgot to close, renders an invisible diagram that still passes `grep '<svg'` and ships blank.
-- **Validate, don't just confirm presence:** run the SVG checks on the PRD HTML (commands in `Shared Standards.md` → Syntax Gate) — `xmllint --noout` must pass (catches an unclosed `</defs>`) AND ≥1 shape element must exist outside `<defs>` (catches the trapped-shapes case). A `grep -c '<svg'` presence test is NOT sufficient.
+- **Validate, don't just confirm presence:** run the SVG checks on the PRD HTML (commands in `Shared_Standards.md` → Syntax Gate) — `xmllint --noout` must pass (catches an unclosed `</defs>`) AND ≥1 shape element must exist outside `<defs>` (catches the trapped-shapes case). A `grep -c '<svg'` presence test is NOT sufficient.
 
 ### Step 11: Save Artifacts
 

@@ -5,4 +5,4 @@ description: Use when writing an Amazon-style PRFAQ (Working Backwards press rel
 
 # PRFAQ (Working Backwards)
 
-Authoritative guide: `prompts/PRFAQ Guide.md`. Save `documents/PRFAQ_[Product]_[YYYY-MM-DD].html`. Headline specific; FAQ skeptical; market research incorporated.
+Authoritative guide: `prompts/PRFAQ_Guide.md`. Save `documents/PRFAQ_[Product]_[YYYY-MM-DD].html`. Headline specific; FAQ skeptical; market research incorporated.
