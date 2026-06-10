@@ -84,7 +84,8 @@ When building for a recognizable company (Discovery Education, Amazon, Google, e
 - ClickablePrototype is exempt (single-file, all CSS inline is fine)
 
 **ScreenIndex placeholders to replace:**
-`[PRODUCT_NAME]`, `[PRODUCT_SLUG]`, `[CUSTOMER_LOGO]`, `[BRAND_PRIMARY]`, `[BRAND_SECONDARY]`, `[BRAND_ACCENT]`, `[DATE]`, `[PROGRESS_PERCENT]`, `[SCREEN_COUNT]`, `[SCREEN_CARDS]`, `[THUMBNAIL_URL]`
+`[PRODUCT_NAME]`, `[PRODUCT_SLUG]`, `[CUSTOMER_LOGO]`, `[BRAND_PRIMARY]`, `[BRAND_SECONDARY]`, `[BRAND_ACCENT]`, `[DATE]`, `[PROGRESS_PERCENT]`, `[SCREEN_COUNT]`, `[SCREEN_CARDS]`
+(Inside the `[SCREEN_CARDS]` example markup, each card has a per-card `[THUMBNAIL_URL]` — replace it with a real thumbnail or use the no-thumbnail `.screen-preview-placeholder` fallback the template shows. Never leave `[THUMBNAIL_URL]` literal.)
 
 **Fully interactive prototypes (REQUIRED):**
 - All buttons/links navigate to correct screens
