@@ -66,6 +66,19 @@
       }
     },
     {
+      "name": "Prototype Spec Validator",
+      "description": "Validates the interaction spec before screens are built",
+      "enabled": true,
+      "trigger": {
+        "type": "onFileSave",
+        "pattern": "**/PrototypeSpec_*.html"
+      },
+      "action": {
+        "type": "agentPrompt",
+        "prompt": "Validate this Prototype Spec (the contract screens are built from):\n\n**Screen Manifest:**\n- [ ] Exact filenames listed for every screen (Screen_[Name]_[Product]_[Date].html — no placeholders left)\n- [ ] Entry-point screen identified\n- [ ] One screen per PRD persona dashboard decision (split vs shared documented)\n\n**Content Link Map:**\n- [ ] Every screen has its outbound in-content links listed (source element → target filename)\n- [ ] Every target filename appears in the screen manifest\n- [ ] No screen is unreachable (every screen is some other screen's target, except the entry point)\n\n**Interactions:**\n- [ ] Each screen lists its interactive elements with expected behavior (forms, modals, dropdowns, tables, chat)\n- [ ] Loading/empty/error states specified where screens have async or data-dependent content\n\nReport gaps to fix BEFORE screen building starts — a hole here becomes a broken link in every screen."
+      }
+    },
+    {
       "name": "Phase Transition: Market Research → PRFAQ",
       "description": "Prompts to continue after Market Research",
       "enabled": true,

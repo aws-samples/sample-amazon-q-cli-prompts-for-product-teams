@@ -113,7 +113,7 @@ CLAUDE.md                       (auto-loads in Claude Code)
 │   ├── prototype-guide.md      (prototype guide - manual)
 │   ├── specialist-*.md         (per-phase specialists - fileMatch, auto-injected when editing the matching output)
 │   └── templates/              (ScreenIndex + ProjectDashboard templates)
-└── hooks.json                  (16 agent hooks: validators, phase transitions, analysis lenses)
+└── hooks.json                  (17 agent hooks: validators, phase transitions, analysis lenses)
 
 prompts/                        (Claude Code / Cursor workflow — single source of truth for both modes)
 ├── Claude_Code_Workflow.md     (main workflow guide)
@@ -167,10 +167,10 @@ samples/                        (example outputs for reference)
 
 > These hooks are **Kiro mode only**. Claude Code's automated gating is narrower — `.claude/settings.json` runs an advisory JS-syntax gate on `Screen_*.html` and an SVG paint check on `PRD_*.html`; everything else below is enforced by the agent via the prose guides rather than a save-triggered hook. See *Native Claude Code primitives*.
 
-`.kiro/hooks.json` defines **16 hooks** in three groups:
+`.kiro/hooks.json` defines **17 hooks** in three groups:
 
 **Automatic validators (trigger on file save):**
-- Market Research Validator, PRFAQ Validator, PRD Validator, Design System Validator, Screen Validator
+- Market Research Validator, PRFAQ Validator, PRD Validator, Prototype Spec Validator, Design System Validator, Screen Validator
 - Kiro Spec Validator (EARS syntax), Tech Stack Validator (prefers AWS-native services)
 
 **Automatic phase transitions (on file save):**
