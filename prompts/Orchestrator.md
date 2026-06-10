@@ -167,6 +167,7 @@ For each phase, you will:
 2. **Invoke Specialized Agent** (these are real subagents in `.claude/agents/`)
    - Use the Task tool with the matching `subagent_type`:
      - Deep Market Research → `deep-research`
+     - AI Framing (AI/ML products only) → `ai-framing`
      - PRFAQ → `prfaq`
      - PRD → `prd`
      - Prototype → `design-system` first (shared CSS + Design Token Contract), then one `screen-builder` per screen (dispatched in parallel), then assemble the ScreenIndex
