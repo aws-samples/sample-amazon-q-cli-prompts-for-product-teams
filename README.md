@@ -138,7 +138,7 @@ documents/                      (auto-generated outputs — gitignored)
 ├── MarketResearch_*.html       (Deep Research output)
 ├── PRFAQ_*.html
 ├── PRD_*.html
-├── PrototypeSpec_*.html        (Interaction Spec)
+├── PrototypeSpec_*.html        (Interaction Spec — internal sub-step artifact)
 ├── DesignSystem_*.html
 ├── Screen_*.html
 └── ProjectDashboard_*.html     (live status, regenerated after every phase)

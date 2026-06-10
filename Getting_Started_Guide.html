@@ -1060,15 +1060,15 @@ claude
                     <div class="code-block" style="background: var(--cream-dark); color: var(--charcoal);">
 "I want to build a fitness tracking app for teenagers that uses AI to create personalized workout plans."
                     </div>
-                    <p style="margin-top: 12px;">The AI will automatically begin the Discovery phase and guide you through the 4-phase workflow.</p>
+                    <p style="margin-top: 12px;">The AI will automatically begin the Discovery phase and guide you through the workflow (4 phases, plus an AI Framing phase for AI/ML products).</p>
                 </div>
 
                 <div class="callout warning">
                     <h4>Differences from Kiro</h4>
                     <ul>
-                        <li>Same 4-phase workflow including market research</li>
+                        <li>Same phase workflow including market research</li>
                         <li>Load phase guides manually (vs. Kiro's automatic steering)</li>
-                        <li>No automatic validation hooks</li>
+                        <li>Narrower automatic validation — Claude Code runs an advisory JS-syntax gate on Screen files and an SVG check on PRDs (<code>.claude/settings.json</code>); Kiro's 16 hooks cover more</li>
                     </ul>
                 </div>
 
