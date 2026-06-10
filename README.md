@@ -273,15 +273,17 @@ The `samples/` folder includes example outputs from a "TeenFit" project:
 
 ```
 samples/
-├── DesignSystem_TeenFit.html      (design tokens & components)
+├── README.md                      (what each sample demonstrates)
+├── teenfit.css                    (shared design tokens & components — the [product-slug].css standard)
+├── DesignSystem_TeenFit.html      (design tokens & components reference)
 ├── PRFAQ_TeenFit.html             (press release & FAQ)
 ├── PRD_TeenFit.html               (product requirements)
-├── Screen_Dashboard_TeenFit.html  (prototype screen)
-├── Screen_Welcome_TeenFit.html    (prototype screen)
+├── Screen_Dashboard_TeenFit.html  (prototype screen — links teenfit.css)
+├── Screen_Welcome_TeenFit.html    (prototype screen — links teenfit.css)
 └── Screen_WorkoutExecution_TeenFit.html
 ```
 
-Open any sample in your browser to see the output quality and design standards. The Design System sample includes extensive comments explaining the design philosophy.
+The screens model the modular CSS standard: shared tokens and components live in `teenfit.css`, with screen-specific overrides in each file's `<style>` block. (`ClickablePrototype_TeenFit.html` is the sanctioned single-file exception.) Open any sample in your browser to see the output quality and design standards. The Design System sample includes extensive comments explaining the design philosophy.
 
 ## Security
 

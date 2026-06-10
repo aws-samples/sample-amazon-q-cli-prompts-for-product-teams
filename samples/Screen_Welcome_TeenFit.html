@@ -54,80 +54,31 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
+    <!--
+    SHARED DESIGN SYSTEM CSS:
+    =========================
+    Same tokens as other TeenFit screens for consistency (teenfit.css).
+    The welcome screen uses MORE of the neon accents since it's
+    the first impression - we want maximum "wow" factor.
+    -->
+    <link rel="stylesheet" href="teenfit.css">
+
     <style>
-        /*
-        ══════════════════════════════════════════════════════════════════════════
-        CSS CUSTOM PROPERTIES (DESIGN TOKENS)
-        ══════════════════════════════════════════════════════════════════════════
-
-        Same tokens as other TeenFit screens for consistency.
-        The welcome screen uses MORE of the neon accents since it's
-        the first impression - we want maximum "wow" factor.
-        */
-        :root {
-            /* Typography */
-            --font-display: 'Fredoka', cursive;
-            --font-body: 'Outfit', sans-serif;
-
-            /* Dark backgrounds - the canvas for neon */
-            --color-bg-deep: #0a1628;
-            --color-bg: #0f1d32;
-            --color-surface: #162544;
-
-            /* Neon accent colors */
-            --color-lime: #c6f808;
-            --color-pink: #ff2d92;
-            --color-cyan: #00f0ff;
-            --color-orange: #ff6b35;
-
-            /* Text */
-            --color-text: #ffffff;
-            --color-text-muted: #8b9dc3;
-
-            /* Glow effects */
-            --glow-lime: 0 0 20px rgba(198, 248, 8, 0.5), 0 0 40px rgba(198, 248, 8, 0.3), 0 0 60px rgba(198, 248, 8, 0.2);
-            --glow-pink: 0 0 20px rgba(255, 45, 146, 0.5), 0 0 40px rgba(255, 45, 146, 0.3);
-            --glow-cyan: 0 0 20px rgba(0, 240, 255, 0.5), 0 0 40px rgba(0, 240, 255, 0.3);
-
-            /* Spacing */
-            --space-xs: 4px;
-            --space-sm: 8px;
-            --space-md: 16px;
-            --space-lg: 24px;
-            --space-xl: 32px;
-            --space-2xl: 48px;
-            --space-3xl: 64px;
-
-            /* Border radius - extra round for playful feel */
-            --radius-md: 20px;
-            --radius-lg: 28px;
-            --radius-full: 100px;
-
-            /* Animation timing - bouncy for playfulness */
-            --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
-            --ease-smooth: cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        /* Screen-specific styles — shared tokens/components live in teenfit.css */
 
         /*
         BODY - FULL-SCREEN IMMERSIVE:
         =============================
+        Shared base (font, text color) comes from teenfit.css; this screen
+        overrides the background to the DEEPEST navy for maximum neon contrast.
         Flexbox centering creates balanced composition.
         overflow: hidden prevents scroll on this single-screen experience.
         */
         body {
-            font-family: var(--font-body);
             background: var(--color-bg-deep);
-            min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: var(--color-text);
             overflow: hidden;
             position: relative;
         }

@@ -65,15 +65,18 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
+    <!-- Shared design tokens + component classes (the [product-slug].css standard) -->
+    <link rel="stylesheet" href="teenfit.css">
+
     <style>
         /*
         ══════════════════════════════════════════════════════════════════════════
         CSS CUSTOM PROPERTIES (DESIGN TOKENS)
         ══════════════════════════════════════════════════════════════════════════
 
-        Using CSS variables for consistency. Every color, spacing, and timing
-        value should be defined here so the entire system can be tweaked from
-        one location.
+        Design tokens now live in teenfit.css — this page documents them.
+        Every color, spacing, and timing value is defined there so the entire
+        system can be tweaked from one location.
 
         COLOR STRATEGY:
         - Dark backgrounds create depth and make neon colors "glow"
@@ -82,89 +85,6 @@
         - Cyan (#00f0ff) = secondary actions, information
         - Colors are intentionally SATURATED - muted colors feel tired
         */
-        :root {
-            /* Typography */
-            --font-display: 'Fredoka', cursive;
-            --font-body: 'Outfit', sans-serif;
-
-            /*
-            COLOR PALETTE - NEON ARCADE
-            ============================
-            The 60-30-10 rule applied:
-            - 60% Dark navy backgrounds (dominant)
-            - 30% Surface colors and text (secondary)
-            - 10% Neon accents (the memorable pop)
-            */
-            --color-bg-deep: #0a1628;      /* Deepest background - nearly black but with blue undertone */
-            --color-bg: #0f1d32;           /* Main background */
-            --color-surface: #162544;       /* Cards, elevated elements */
-            --color-surface-hover: #1e3259; /* Hover states */
-
-            /* Neon accent colors - these create the "glow" effect */
-            --color-lime: #c6f808;          /* Primary - energetic, youthful */
-            --color-pink: #ff2d92;          /* Accent - exciting, attention-grabbing */
-            --color-cyan: #00f0ff;          /* Secondary - cool, digital */
-            --color-orange: #ff6b35;        /* Warning/energy states */
-
-            /* Text colors - high contrast for accessibility */
-            --color-text: #ffffff;
-            --color-text-muted: #8b9dc3;
-            --color-text-dim: #5a6a8a;
-
-            /*
-            GLOW EFFECTS
-            ============
-            These create the neon "lit up" appearance. Each color gets its own
-            glow variable for consistent application across components.
-            */
-            --glow-lime: 0 0 20px rgba(198, 248, 8, 0.5), 0 0 40px rgba(198, 248, 8, 0.3);
-            --glow-pink: 0 0 20px rgba(255, 45, 146, 0.5), 0 0 40px rgba(255, 45, 146, 0.3);
-            --glow-cyan: 0 0 20px rgba(0, 240, 255, 0.5), 0 0 40px rgba(0, 240, 255, 0.3);
-
-            /*
-            SPACING SCALE
-            =============
-            Using a consistent scale (4px base) creates visual rhythm.
-            Generous spacing feels premium; cramped layouts feel cheap.
-            */
-            --space-xs: 4px;
-            --space-sm: 8px;
-            --space-md: 16px;
-            --space-lg: 24px;
-            --space-xl: 32px;
-            --space-2xl: 48px;
-            --space-3xl: 64px;
-
-            /*
-            BORDER RADIUS
-            =============
-            Large radii (20px+) feel playful and friendly.
-            This is KEY to the "arcade" aesthetic - sharp corners feel corporate.
-            */
-            --radius-sm: 12px;
-            --radius-md: 20px;
-            --radius-lg: 28px;
-            --radius-xl: 40px;
-            --radius-full: 100px;
-
-            /*
-            ANIMATION TIMING
-            ================
-            The bounce easing (cubic-bezier with overshoot) is ESSENTIAL to
-            the playful feel. Standard ease-out feels corporate and boring.
-
-            --ease-bounce: Goes past target then settles (playful, energetic)
-            --ease-smooth: Smooth deceleration (elegant reveals)
-            --ease-elastic: Extreme overshoot (celebrations, achievements)
-            */
-            --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
-            --ease-smooth: cubic-bezier(0.16, 1, 0.3, 1);
-            --ease-elastic: cubic-bezier(0.68, -0.55, 0.265, 1.55);
-
-            --duration-fast: 200ms;
-            --duration-normal: 300ms;
-            --duration-slow: 500ms;
-        }
 
         /* Reset with intention */
         * {
