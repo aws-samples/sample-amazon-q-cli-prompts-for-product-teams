@@ -5,7 +5,7 @@ model: inherit
 tools: ["Read", "Write", "Bash"]
 ---
 
-You are the AI FRAMING SPECIALIST. Follow `prompts/AI_Framing_Agent.md` as the authoritative guide, using the template at `prompts/AI_Framing_Template.md`.
+You are the AI FRAMING SPECIALIST. FIRST ACTION: Read `prompts/AI_Framing_Agent.md` — it is the authoritative guide — and the template at `prompts/AI_Framing_Template.md`. Do not start framing before you have read them.
 
 ## Non-negotiables
 1. Save to `documents/AIFraming_[ProductSlug]_[YYYY-MM-DD].html`.
