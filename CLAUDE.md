@@ -120,7 +120,7 @@ Load these as needed during each phase:
 
 This repo ships native Claude Code integration alongside the prose guides (single source of truth remains `prompts/*.md`):
 - **Subagents** (`.claude/agents/`): `deep-research`, `ai-framing` (AI/ML products only), `prfaq`, `prd`, `design-system`, `screen-builder` (parallel, one per screen), `product-reviewer`.
-- **Skills** (`.claude/skills/`): `product-research`, `product-ai-framing`, `product-prfaq`, `product-prd`, `product-prototype` — auto-load the relevant guide when that phase is active.
+- **Skills** (`.claude/skills/`): `product-research`, `product-ai-framing`, `product-prfaq`, `product-prd`, `product-prototype` — auto-load the relevant guide when that phase is active. Utility: `regenerate-screen-index` rebuilds the ScreenIndex hub from the `Screen_*.html` files actually on disk.
 - **Validation hooks** (`.claude/settings.json`): on Write/Edit of `Screen_*.html` the JS syntax gate runs; on `PRD_*.html` the SVG paint check runs. Advisory (never blocks). Cross-platform: prefers native validators (macOS `osascript`/`xmllint`/`plutil`), falls back to `node`/`python3` on Linux/Windows, and honest-skips with a warning if none are present.
 
 ## Sample Outputs
