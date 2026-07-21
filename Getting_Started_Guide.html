@@ -1060,15 +1060,15 @@ claude
                     <div class="code-block" style="background: var(--cream-dark); color: var(--charcoal);">
 "I want to build a fitness tracking app for teenagers that uses AI to create personalized workout plans."
                     </div>
-                    <p style="margin-top: 12px;">The AI will automatically begin the Discovery phase and guide you through the 4-phase workflow.</p>
+                    <p style="margin-top: 12px;">The AI will automatically begin the Discovery phase and guide you through the workflow (4 phases, plus an AI Framing phase for AI/ML products).</p>
                 </div>
 
                 <div class="callout warning">
                     <h4>Differences from Kiro</h4>
                     <ul>
-                        <li>Same 4-phase workflow including market research</li>
+                        <li>Same phase workflow including market research</li>
                         <li>Load phase guides manually (vs. Kiro's automatic steering)</li>
-                        <li>No automatic validation hooks</li>
+                        <li>Narrower automatic validation — Claude Code runs an advisory JS-syntax gate on Screen files and an SVG check on PRDs (<code>.claude/settings.json</code>); Kiro's 17 hooks cover more</li>
                     </ul>
                 </div>
 
@@ -1112,19 +1112,19 @@ your-project/
 ├── <span class="highlight">CLAUDE.md</span>                     <span class="comment">(auto-loads in Claude Code)</span>
 ├── <span class="highlight">.cursorrules</span>                  <span class="comment">(hidden - auto-loads in Cursor)</span>
 ├── <span class="highlight">.claude/</span>                      <span class="comment">(Claude Code native layer - hidden)</span>
-│   ├── agents/                    <span class="comment">(6 subagents, incl. parallel screen-builder)</span>
-│   ├── skills/                    <span class="comment">(4 phase skills)</span>
+│   ├── agents/                    <span class="comment">(7 subagents, incl. parallel screen-builder)</span>
+│   ├── skills/                    <span class="comment">(5 phase skills)</span>
 │   └── settings.json              <span class="comment">(advisory validation hooks)</span>
 ├── prompts/
 │   ├── Claude_Code_Workflow.md    <span class="comment">(main workflow guide)</span>
 │   ├── Orchestrator.md            <span class="comment">(coordination + agent dispatch)</span>
-│   ├── Shared Standards.md        <span class="comment">(runtime baseline, syntax gate)</span>
-│   ├── Deep Research Agent.md
-│   ├── AI Framing Agent.md
-│   ├── PRFAQ Guide.md
-│   ├── PRD Creation Guide.md
-│   ├── Prototype Spec Guide.md
-│   └── Prototype Creation Guide.md
+│   ├── Shared_Standards.md        <span class="comment">(runtime baseline, syntax gate)</span>
+│   ├── Deep_Research_Agent.md
+│   ├── AI_Framing_Agent.md
+│   ├── PRFAQ_Guide.md
+│   ├── PRD_Creation_Guide.md
+│   ├── Prototype_Spec_Guide.md
+│   └── Prototype_Creation_Guide.md
 │
 └── documents/                      <span class="comment">(auto-generated outputs)</span>
     ├── lib/chart.min.js            <span class="comment">(downloaded at build time)</span>
@@ -1352,7 +1352,7 @@ samples/
         <div id="tips" class="tab-content">
             <div class="section">
                 <h2>Tips & Agent Hooks</h2>
-                <p>The <code>.kiro/hooks.json</code> file includes 16 hooks that activate automatically (on file save) or on-demand. Claude Code users get equivalent native agents, skills, and validation hooks under <code>.claude/</code> &mdash; see Option B.</p>
+                <p>The <code>.kiro/hooks.json</code> file includes 17 hooks that activate automatically (on file save) or on-demand. Claude Code users get equivalent native agents, skills, and validation hooks under <code>.claude/</code> &mdash; see Option B.</p>
 
                 <div class="hooks-category">
                     <h4>Automatic Validators (on file save)</h4>

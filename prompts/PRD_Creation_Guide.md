@@ -37,7 +37,7 @@ You will receive a handoff payload containing:
 
 You must produce:
 
-1. **PRD Document** (markdown + HTML) saved to `documents/`
+1. **PRD Document** (HTML) saved to `documents/`
 2. **Design System** (HTML) if not already created
 3. **Structured Summary** for handoff to Prototype Agent
 
@@ -89,9 +89,9 @@ You must produce:
     "screens_identified": ["string (screen names for prototype)"]
   },
   "artifacts": {
-    "markdown_path": "documents/PRD_[ProductSlug]_[Date].md",
     "html_path": "documents/PRD_[ProductSlug]_[Date].html",
-    "design_system_path": "documents/DesignSystem_[ProductSlug]_[Date].html"
+    "design_system_path": "documents/DesignSystem_[ProductSlug]_[Date].html",
+    "kiro_spec_path": ".kiro/specs/[product-slug]/requirements.md"
   }
 }
 ```
@@ -171,8 +171,8 @@ Document for each product feature:
   "build_stack": [
     {
       "category": "string (e.g., 'AI/ML', 'Database', 'Frontend')",
-      "recommendation": "string (e.g., 'Amazon Bedrock with Claude 4 Sonnet')",
-      "version": "string (e.g., 'claude-sonnet-4-6-20250514')",
+      "recommendation": "string (e.g., 'Amazon Bedrock with the latest Claude model')",
+      "version": "string — ILLUSTRATIVE ONLY: look up the current model ID in Step 1's technology research; do NOT paste this placeholder. Model IDs change frequently.",
       "rationale": "string (why this choice for this product)",
       "source_url": "string (documentation or announcement link)"
     }
@@ -374,7 +374,7 @@ Based on requirements and personas, list all screens needed:
 ### Step 9: Create Design System (if not exists)
 
 If no design system exists, create `DesignSystem_[ProductSlug]_[Date].html` with:
-- Color palette (use defaults from `Shared Standards.md` unless brand provided)
+- Color palette (use defaults from `Shared_Standards.md` unless brand provided)
 - Typography scale
 - Component library (buttons, forms, cards, navigation)
 - Spacing system
@@ -487,14 +487,15 @@ Every PRD MUST include an inline SVG architecture diagram in the Technical Archi
 **`<defs>` discipline (prevents a blank diagram):**
 - `<defs>` holds ONLY definitions — `<marker>`, `<linearGradient>`, `<filter>`, `<style>`, `<symbol>`. It is never painted.
 - **Every rendered shape (`<rect>`, `<text>`, `<path>`, `<line>`, `<circle>`, `<g>`) MUST come AFTER `</defs>`** — exactly as in the pattern above. A shape left inside `<defs>`, or a `<defs>` you forgot to close, renders an invisible diagram that still passes `grep '<svg'` and ships blank.
-- **Validate, don't just confirm presence:** run the SVG checks on the PRD HTML (commands in `Shared Standards.md` → Syntax Gate) — `xmllint --noout` must pass (catches an unclosed `</defs>`) AND ≥1 shape element must exist outside `<defs>` (catches the trapped-shapes case). A `grep -c '<svg'` presence test is NOT sufficient.
+- **Validate, don't just confirm presence:** run the SVG checks on the PRD HTML (commands in `Shared_Standards.md` → Syntax Gate) — `xmllint --noout` must pass (catches an unclosed `</defs>`) AND ≥1 shape element must exist outside `<defs>` (catches the trapped-shapes case). A `grep -c '<svg'` presence test is NOT sufficient.
 
 ### Step 11: Save Artifacts
 
 Save to `./documents/`:
-- `PRD_[ProductSlug]_[YYYY-MM-DD].md`
 - `PRD_[ProductSlug]_[YYYY-MM-DD].html`
 - `DesignSystem_[ProductSlug]_[YYYY-MM-DD].html` (if created)
+
+The Kiro spec `requirements.md` (in `.kiro/specs/[product-slug]/`) is the one markdown artifact — it is a machine-consumed spec, not the human-facing deliverable.
 
 ### Step 12: Produce Handoff Summary
 

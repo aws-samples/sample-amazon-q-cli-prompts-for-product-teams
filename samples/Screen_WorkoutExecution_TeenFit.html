@@ -46,67 +46,25 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
+    <!--
+    SHARED DESIGN SYSTEM CSS:
+    =========================
+    Design tokens, CSS reset, body base, shimmer keyframes, and the
+    canonical .btn family live in teenfit.css.
+    -->
+    <link rel="stylesheet" href="teenfit.css">
+
     <style>
-        /*
-        ══════════════════════════════════════════════════════════════════════════
-        CSS CUSTOM PROPERTIES
-        ══════════════════════════════════════════════════════════════════════════
-        */
-        :root {
-            --font-display: 'Fredoka', cursive;
-            --font-body: 'Outfit', sans-serif;
-
-            --color-bg-deep: #0a1628;
-            --color-bg: #0f1d32;
-            --color-surface: #162544;
-            --color-surface-hover: #1e3259;
-
-            --color-lime: #c6f808;
-            --color-pink: #ff2d92;
-            --color-cyan: #00f0ff;
-            --color-orange: #ff6b35;
-            --color-yellow: #ffd43b;
-
-            --color-text: #ffffff;
-            --color-text-muted: #8b9dc3;
-
-            --glow-lime: 0 0 20px rgba(198, 248, 8, 0.5), 0 0 40px rgba(198, 248, 8, 0.3);
-            --glow-orange: 0 0 20px rgba(255, 107, 53, 0.5), 0 0 40px rgba(255, 107, 53, 0.3);
-            --glow-pink: 0 0 20px rgba(255, 45, 146, 0.5), 0 0 40px rgba(255, 45, 146, 0.3);
-
-            --space-xs: 4px;
-            --space-sm: 8px;
-            --space-md: 16px;
-            --space-lg: 24px;
-            --space-xl: 32px;
-            --space-2xl: 48px;
-
-            --radius-sm: 12px;
-            --radius-md: 20px;
-            --radius-lg: 28px;
-            --radius-full: 100px;
-
-            --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
-            --ease-smooth: cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        /* Screen-specific styles — shared tokens/components live in teenfit.css */
 
         /*
         BODY LAYOUT:
         ============
+        Shared base (font, background, text color) comes from teenfit.css.
         Full-height flexbox layout for workout screen.
         Three sections: header, exercise content, controls.
         */
         body {
-            font-family: var(--font-body);
-            background: var(--color-bg);
-            min-height: 100vh;
-            color: var(--color-text);
             display: flex;
             flex-direction: column;
             overflow-x: hidden;
@@ -191,17 +149,13 @@
             transition: width 0.5s var(--ease-bounce);
         }
 
+        /* Shimmer keyframes are shared in teenfit.css */
         .progress-fill::after {
             content: '';
             position: absolute;
             inset: 0;
             background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
             animation: shimmer 2s infinite;
-        }
-
-        @keyframes shimmer {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
         }
 
         /*
@@ -404,21 +358,19 @@
             border-top: 1px solid rgba(255, 255, 255, 0.08);
         }
 
+        /*
+        Screen-local override of shared .btn family (canonical version in
+        teenfit.css). This screen needs:
+        - flex: 1 so all three controls share the row equally
+        - tighter horizontal padding (three buttons must fit on mobile)
+        - SOLID secondary buttons (outline style is too subtle to hit
+          mid-workout) with a calmer hover
+        - a slightly smaller primary hover lift (less bounce while moving)
+        The identical .btn-primary base colors come from teenfit.css.
+        */
         .btn {
             flex: 1;
             padding: 14px var(--space-md);
-            border-radius: var(--radius-full);
-            font-family: var(--font-display);
-            font-size: 0.95rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s var(--ease-bounce);
-            border: none;
-        }
-
-        .btn-primary {
-            background: var(--color-lime);
-            color: var(--color-bg-deep);
         }
 
         .btn-primary:hover {
@@ -434,6 +386,10 @@
 
         .btn-secondary:hover {
             background: var(--color-surface-hover);
+            /* Explicitly reset the shared hover's lime border/text -
+               the shared rule still applies any property not re-declared here */
+            border-color: var(--color-surface-hover);
+            color: var(--color-text);
             transform: translateY(-2px);
         }
 

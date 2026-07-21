@@ -374,9 +374,9 @@
       ============================================================================
       DATA-DRIVEN DASHBOARD — edit the CONFIG below, never hand-edit the HTML rows.
       ============================================================================
-      To update after a phase: change a phase's `status` (and fill in card `href`s)
-      in the PHASES array, then regenerate this file WHOLESALE. The progress bar,
-      status badges, and links all derive from the array — so a status change can
+      To update after a phase: change a card's `status` (and fill in its `href`s)
+      in the CONFIG object below, then regenerate this file WHOLESALE. The progress
+      bar, status badges, and links all derive from CONFIG — so a status change can
       never produce an orphaned <div> or unbalanced tag.
 
       status values: "completed" | "in-progress" | "pending"
@@ -402,8 +402,7 @@
                     cards: [
                         { title: "Press Release & FAQ", status: "pending",
                           description: "Customer-focused narrative defining the product vision and value proposition.",
-                          actions: [ { label: "View HTML", href: null, primary: true },
-                                     { label: "Markdown", href: null, primary: false } ] }
+                          actions: [ { label: "View PRFAQ", href: null, primary: true } ] }
                     ]
                 },
                 {
@@ -412,8 +411,7 @@
                     cards: [
                         { title: "PRD Document", status: "pending",
                           description: "Detailed requirements including features, personas, success metrics, and acceptance criteria.",
-                          actions: [ { label: "View HTML", href: null, primary: true },
-                                     { label: "Markdown", href: null, primary: false } ] }
+                          actions: [ { label: "View PRD", href: null, primary: true } ] }
                     ]
                 },
                 {

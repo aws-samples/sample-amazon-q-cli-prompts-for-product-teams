@@ -1,0 +1,212 @@
+/*
+══════════════════════════════════════════════════════════════════════════════
+TEENFIT SHARED DESIGN SYSTEM CSS
+══════════════════════════════════════════════════════════════════════════════
+
+Shared tokens and component classes for all Screen_*_TeenFit.html files.
+
+This models the [product-slug].css standard from CLAUDE.md: tokens + shared
+components live here; screen-specific styles stay in each screen's <style>
+block (< 50 lines target for new builds, using var() for colors).
+
+Aesthetic Direction: NEON ARCADE
+Visual reference page: DesignSystem_TeenFit.html
+*/
+
+/*
+══════════════════════════════════════════════════════════════════════════
+CSS CUSTOM PROPERTIES (DESIGN TOKENS)
+══════════════════════════════════════════════════════════════════════════
+
+Every color, spacing, and timing value is defined here so the entire
+system can be tweaked from one location. Using CSS variables ensures
+consistency across all screens — changes to the design system
+automatically propagate to every screen that links this file.
+
+COLOR STRATEGY:
+---------------
+60-30-10 Rule:
+- 60% Dark backgrounds (--color-bg, --color-bg-deep)
+- 30% Surface colors, text (--color-surface, --color-text)
+- 10% Neon accents (--color-lime, --color-pink, --color-cyan)
+
+The neon colors are the MEMORABLE part. Use sparingly for impact.
+Colors are intentionally SATURATED - muted colors feel tired.
+*/
+:root {
+    /*
+    TYPOGRAPHY:
+    -----------
+    - Fredoka: Display font for headers, buttons, stats. Rounded
+      letterforms feel playful, NOT childish.
+    - Outfit: Body text. Geometric, modern, highly readable.
+    Neither is overused (unlike Inter, Roboto, Poppins).
+    */
+    --font-display: 'Fredoka', cursive;
+    --font-body: 'Outfit', sans-serif;
+
+    /* Background colors - dark mode creates depth for neon glow */
+    --color-bg-deep: #0a1628;      /* Deepest background - nearly black with blue undertone */
+    --color-bg: #0f1d32;           /* Main background */
+    --color-surface: #162544;       /* Cards, elevated elements */
+    --color-surface-hover: #1e3259; /* Hover states */
+
+    /* Neon accent colors - the "arcade" feel */
+    --color-lime: #c6f808;     /* Primary action, success, energy */
+    --color-pink: #ff2d92;     /* Highlights, notifications, excitement */
+    --color-cyan: #00f0ff;     /* Secondary, information, cool */
+    --color-orange: #ff6b35;   /* Warning, streaks, fire */
+    --color-yellow: #ffd43b;   /* Progress, achievements, gold */
+
+    /* Text hierarchy - high contrast for accessibility */
+    --color-text: #ffffff;
+    --color-text-muted: #8b9dc3;
+    --color-text-dim: #5a6a8a;
+
+    /*
+    GLOW EFFECTS:
+    -------------
+    The signature "neon sign" look. Multiple box-shadows at different
+    blur radii create the diffuse glow effect.
+    --glow-lime carries a third 60px layer for hero moments
+    (e.g., the Welcome screen logo) - the richest version wins
+    in a shared file.
+    */
+    --glow-lime: 0 0 20px rgba(198, 248, 8, 0.5), 0 0 40px rgba(198, 248, 8, 0.3), 0 0 60px rgba(198, 248, 8, 0.2);
+    --glow-pink: 0 0 20px rgba(255, 45, 146, 0.5), 0 0 40px rgba(255, 45, 146, 0.3);
+    --glow-cyan: 0 0 20px rgba(0, 240, 255, 0.5), 0 0 40px rgba(0, 240, 255, 0.3);
+    --glow-orange: 0 0 20px rgba(255, 107, 53, 0.5), 0 0 40px rgba(255, 107, 53, 0.3);
+
+    /*
+    SPACING SCALE:
+    --------------
+    4px base for visual rhythm. Generous spacing feels premium;
+    cramped layouts feel cheap.
+    */
+    --space-xs: 4px;
+    --space-sm: 8px;
+    --space-md: 16px;
+    --space-lg: 24px;
+    --space-xl: 32px;
+    --space-2xl: 48px;
+    --space-3xl: 64px;
+
+    /*
+    BORDER RADIUS:
+    -------------
+    Large radii (20px+) are ESSENTIAL for the arcade feel.
+    Sharp corners = corporate. Round corners = friendly.
+    */
+    --radius-sm: 12px;
+    --radius-md: 20px;
+    --radius-lg: 28px;
+    --radius-xl: 40px;
+    --radius-full: 100px;
+
+    /*
+    ANIMATION TIMING:
+    -----------------
+    --ease-bounce uses cubic-bezier with overshoot (1.56 > 1).
+    This creates the playful "spring" effect on all transitions.
+    Standard ease-out (0,0,0.2,1) feels flat and corporate.
+
+    --ease-bounce: Goes past target then settles (playful, energetic)
+    --ease-smooth: Smooth deceleration (elegant reveals)
+    --ease-elastic: Extreme overshoot (celebrations, achievements)
+    */
+    --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+    --ease-smooth: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-elastic: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+    --duration-fast: 200ms;
+    --duration-normal: 300ms;
+    --duration-slow: 500ms;
+}
+
+/* CSS Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/*
+BODY BASE:
+==========
+The shared canvas: dark background + body font + white text.
+Dark background is the canvas for neon elements.
+Screen-specific layout (flex centering, nav padding, overflow) and
+background overrides (e.g., Welcome's deeper --color-bg-deep) stay
+in each screen's local <style> block.
+*/
+body {
+    font-family: var(--font-body);
+    background: var(--color-bg);
+    color: var(--color-text);
+    min-height: 100vh;
+}
+
+/*
+SHIMMER:
+========
+Shared keyframes for the moving highlight on progress-bar fills.
+A gradient sweep (transparent → white → transparent) translated
+across the fill makes progress feel "alive".
+*/
+@keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+/*
+══════════════════════════════════════════════════════════════════════════
+BUTTON COMPONENTS (shared canonical family)
+══════════════════════════════════════════════════════════════════════════
+
+Two button styles:
+1. PRIMARY: Main action (Start Workout) - lime with glow
+2. SECONDARY: Alternate action (Browse) - outline style
+
+BUTTON DESIGN PRINCIPLES:
+- Large touch targets (48px+ height) for mobile
+- Full border-radius for friendly appearance
+- Bounce animation on hover for satisfying feedback
+
+NOTE: Layout-context properties (e.g., flex: 1 inside a button row)
+stay in each screen's local <style> block - this file only carries
+the visual identity of the family.
+*/
+.btn {
+    padding: 14px var(--space-lg);
+    border-radius: var(--radius-full);
+    font-family: var(--font-display);
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-decoration: none;
+    text-align: center;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s var(--ease-bounce);
+}
+
+.btn-primary {
+    background: var(--color-lime);
+    color: var(--color-bg-deep);
+}
+
+.btn-primary:hover {
+    transform: translateY(-4px) scale(1.03);
+    box-shadow: var(--glow-lime);
+}
+
+.btn-secondary {
+    background: transparent;
+    color: var(--color-text);
+    border: 2px solid var(--color-surface-hover);
+}
+
+.btn-secondary:hover {
+    border-color: var(--color-lime);
+    color: var(--color-lime);
+    transform: translateY(-3px);
+}

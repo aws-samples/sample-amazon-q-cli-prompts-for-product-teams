@@ -255,7 +255,7 @@ Search in this order — stop when you have a candidate:
 Before proceeding, verify:
 - [ ] File saved to `./documents/MarketResearch_[ProductName]_[YYYY-MM-DD].html`
 - [ ] **Quality gate passed:** 120+ sources (standard) or 150+ (comprehensive), 15+/20+ per dimension
-- [ ] All 6 dimensions researched (Industry, Competitive, Customer, Technology, Innovation, Policy/Risk/Opportunity)
+- [ ] All 6 dimensions researched (Industry, Competitive, Customer, Technology, Adjacent Innovation, Policy/Risk/Opportunity)
 - [ ] TAM/SAM/SOM includes actual dollar figures with cited sources
 - [ ] At least 5 competitors analyzed with real pricing data (fetched from their sites)
 - [ ] Pain points ranked by severity × frequency with source citations
@@ -509,7 +509,7 @@ Before marking complete, verify:
 - [ ] **Customer typography applied** (or closest available Google Font match)
 - [ ] Design System file includes comment documenting brand source
 
-**Post-Build Validation (REQUIRED — see `#steering/prototype-guide.md` Step 8.5):**
+**Post-Build Validation (REQUIRED — see `#steering/prototype-guide.md` → "Post-Build Validation" section):**
 - [ ] CSS loads correctly on all screens (no unstyled HTML)
 - [ ] All cross-screen links resolve against manifest
 - [ ] Sidebar shell consistent (full `<aside>` structure matches template, not just nav items)
@@ -588,16 +588,22 @@ Before starting any work:
 4. Confirm the dashboard is visible to the user
 
 ### Dashboard is data-driven — regenerate wholesale, NEVER patch structure
-The dashboard renders its phases from a single phase-state array, e.g.:
+The dashboard renders its phases and cards from a single `CONFIG` object near the top of the file:
 ```js
-const PHASES = [
-  { name: "Deep Market Research", status: "completed", doc: "MarketResearch_[Product]_[Date].html" },
-  { name: "PRFAQ",                status: "pending",   doc: null },
-  { name: "PRD",                  status: "pending",   doc: null },
-  { name: "Prototype",            status: "pending",   doc: null },
-];
+const CONFIG = {
+  product: "[ProductName]",
+  lastUpdated: "[LastUpdated]",
+  phases: [
+    { number: "01", title: "Market Research", description: "...",
+      cards: [ { title: "Research Brief", status: "pending",   // "completed" | "in-progress" | "pending"
+                 description: "...",
+                 actions: [ { label: "View Research", href: null, primary: true } ] } ] },
+    // ...PRFAQ, Requirements (PRD), Prototype phases follow the same shape.
+    // The Prototype "Screen Library" card uses `screens: [{ name, path }]` instead of `actions`.
+  ]
+};
 ```
-**To update the dashboard, change one `status`/`doc` value in that array and regenerate the entire file wholesale.** NEVER apply chained `strReplace`/string-replace edits to the dashboard's structural HTML (phase rows, status badges, links). Patching structural HTML in place is how orphaned/unbalanced tags appear (a stray `<div>` with no closing tag). When phases render from the array, a status update changes a data value only and cannot produce malformed markup. The template at `#steering/templates/ProjectDashboard_Template.html` already renders from this array — copy it and edit the array, do not hand-edit its rows.
+**To update the dashboard, set the phase card's `status` to `"completed"` and fill its action `href`(s) in `CONFIG`, then regenerate the entire file wholesale.** NEVER apply chained `strReplace`/string-replace edits to the dashboard's structural HTML (phase rows, status badges, links). Patching structural HTML in place is how orphaned/unbalanced tags appear (a stray `<div>` with no closing tag). When phases render from `CONFIG`, a status update changes a data value only and cannot produce malformed markup. The template at `#steering/templates/ProjectDashboard_Template.html` already renders from `CONFIG` — copy it and edit `CONFIG`, do not hand-edit its rows.
 
 ### After EVERY Phase Completion
 This is MANDATORY - do not skip:
@@ -605,8 +611,8 @@ This is MANDATORY - do not skip:
 1. Save the phase document
 2. Run validation checks for that phase
 3. **Regenerate the dashboard HTML file wholesale** (do NOT str-replace its structure):
-   - Update the phase's `status` and `doc` values in the `PHASES` array
-   - Re-emit the entire file from the array (progress %, timestamp, and links all derive from it)
+   - Set the phase card's `status` to "completed" and fill its action `href`(s) in `CONFIG`
+   - Re-emit the entire file from `CONFIG` (progress %, timestamp, and links all derive from it)
 4. **Re-open the dashboard in the browser:**
    ```bash
    open ./documents/ProjectDashboard_[ProductName]_[YYYY-MM-DD].html

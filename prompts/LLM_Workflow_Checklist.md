@@ -1,18 +1,15 @@
 # LLM Workflow Checklist: Independent Product Development Process
 
-> **NEW: Multi-Agent Architecture Available**
+> # ⛔ DEPRECATED — DO NOT FOLLOW THIS FILE
+> #
+> **This is a stale single-agent checklist that contradicts the current workflow.** It runs AI Framing as "Phase 0" *before* market research, mandates markdown+HTML outputs, and omits web-based deep research — all of which the live workflow has since changed.
 >
-> This toolkit now supports a **multi-agent architecture** for modern AI CLI tools (Kiro-cli, Claude Code). The multi-agent approach provides:
-> - **Protected context windows** - Each agent receives only what it needs
-> - **Web-enabled market research** - Dedicated agent for competitive analysis
-> - **Better quality** - Specialized agents focus on their domain
-> - **Resumable workflows** - Session state enables pause/resume
+> **For Claude Code / Cursor:** follow `prompts/Claude_Code_Workflow.md` and `prompts/Orchestrator.md`.
+> **For Kiro:** the `.kiro/steering/*.md` files load automatically.
 >
-> **To use multi-agent mode:** Load `prompts/Orchestrator.md` instead of this file.
+> The current order is: **Deep Market Research → AI Framing (1b, optional) → PRFAQ → PRD → Prototype**, all output as **HTML** (no markdown deliverables).
 >
-> **This file (Legacy Mode)** remains available for single-agent tools or simpler workflows. It works the same as before but doesn't include web-based market research.
->
-> See `README.md` for full architecture documentation.
+> This file is retained only for historical reference. Do not load it during a build.
 
 ---
 
@@ -36,7 +33,7 @@ This checklist provides step-by-step instructions for the independent product de
 **AI/ML Indicators:** ML models, AI capabilities, data prediction, NLP, computer vision, recommendations, automated decisions, pattern recognition, or generative AI features.
 
 **If AI/ML indicators are evident from the description:**
-- Proceed with Phase 0 (AI Framing) using `templates/ai_framing_template.md`
+- Proceed with Phase 0 (AI Framing) using `prompts/AI_Framing_Template.md`
 
 **If AI/ML indicators are unclear:**
 - Ask follow-up questions: "Based on your description, I want to clarify - will this product involve any machine learning, AI capabilities, data prediction, or automated decision-making features?"
@@ -131,7 +128,7 @@ Before advancing to next phase, verify:
 ## Phase 0: AI Framing (AI/ML Products Only)
 
 ### Step 0.1: Complete AI Framing Analysis
-**Template:** `templates/ai_framing_template.md`
+**Template:** `prompts/AI_Framing_Template.md`
 **LLM Instructions:**
 1. Ask user for AI/ML product concept (capabilities, data sources, business metrics)
 2. Work through template sections: Business Goals, ML Problem Framing, Data Strategy, Performance Metrics, Feasibility Assessment
@@ -149,7 +146,7 @@ Before advancing to next phase, verify:
 ## Phase 1: PRFAQ Creation
 
 ### Step 1: Initialize PRFAQ Process
-**Prompt to Use:** `PRFAQ Guide.md`
+**Prompt to Use:** `PRFAQ_Guide.md`
 **Input Required:** Product idea or concept (+ AI Framing document if AI/ML product)
 **LLM Instructions:**
 1. Load the PRFAQ Guide prompt
@@ -213,7 +210,7 @@ Before advancing to next phase, verify:
 ## Phase 2: PRD Creation
 
 ### Step 5: Initialize PRD Process
-**Prompt to Use:** `PRD Creation Guide.md`
+**Prompt to Use:** `PRD_Creation_Guide.md`
 **Input Required:** Approved PRFAQ document from Phase 1 (+ AI Framing document if AI/ML product)
 **LLM Instructions:**
 1. Load the PRD Creation Guide prompt
@@ -284,7 +281,7 @@ Before advancing to next phase, verify:
 ## Phase 3: Prototype Creation
 
 ### Step 8: Initialize Prototype Process
-**Prompt to Use:** `Prototype Creation Guide.md`
+**Prompt to Use:** `Prototype_Creation_Guide.md`
 **Input Required:** Approved PRD document from Phase 2
 **LLM Instructions:**
 1. Load the Prototype Creation Guide prompt

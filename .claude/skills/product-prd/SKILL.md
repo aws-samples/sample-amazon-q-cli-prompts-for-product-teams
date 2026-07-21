@@ -5,6 +5,6 @@ description: Use when writing a PRD — EARS requirements, personas, success met
 
 # PRD
 
-Authoritative guide: `prompts/PRD Creation Guide.md`. Save `documents/PRD_[Product]_[YYYY-MM-DD].html`.
+Authoritative guide: `prompts/PRD_Creation_Guide.md`. Save `documents/PRD_[Product]_[YYYY-MM-DD].html`.
 
-Gates: EARS syntax; testable requirements; AWS-native (current-year sourced); inline SVG architecture diagram with all shapes AFTER `</defs>` — validate via `prompts/Shared Standards.md` → Syntax Gate.
+Gates: EARS syntax; testable requirements; AWS-native (current-year sourced); inline SVG architecture diagram with all shapes AFTER `</defs>` — validate via `prompts/Shared_Standards.md` → Syntax Gate.

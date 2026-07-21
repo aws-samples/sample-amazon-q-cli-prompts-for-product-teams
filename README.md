@@ -35,7 +35,7 @@ All outputs are **standalone HTML files** that open directly in any browser - no
 ## Workflow Phases
 
 ### Phase 1: Deep Market Research
-- 6 parallel research dimensions (Industry, Competitive, Customer, Technology, Innovation, Policy/Regulatory)
+- 6 parallel research dimensions (Industry, Competitive, Customer, Technology, Adjacent Innovation, Policy/Risk/Opportunity)
 - 120+ sources minimum with quality gates
 - Market sizing (TAM/SAM/SOM with sources)
 - Customer pain points research
@@ -113,24 +113,24 @@ CLAUDE.md                       (auto-loads in Claude Code)
 │   ├── prototype-guide.md      (prototype guide - manual)
 │   ├── specialist-*.md         (per-phase specialists - fileMatch, auto-injected when editing the matching output)
 │   └── templates/              (ScreenIndex + ProjectDashboard templates)
-└── hooks.json                  (16 agent hooks: validators, phase transitions, analysis lenses)
+└── hooks.json                  (17 agent hooks: validators, phase transitions, analysis lenses)
 
 prompts/                        (Claude Code / Cursor workflow — single source of truth for both modes)
 ├── Claude_Code_Workflow.md     (main workflow guide)
 ├── Orchestrator.md             (coordination + per-phase agent dispatch)
-├── Shared Standards.md         (runtime baseline, syntax gate, file naming, budgets)
-├── Deep Research Agent.md      (6 parallel dimensions, quality gates)
-├── AI Framing Agent.md         (AI/ML products only)
-├── PRFAQ Guide.md
-├── PRD Creation Guide.md       (includes Technology Research)
-├── Prototype Spec Guide.md     (interaction blueprint)
-├── Prototype Creation Guide.md
-├── Handoff Schema.md           (inter-phase payload contract)
+├── Shared_Standards.md         (runtime baseline, syntax gate, file naming, budgets)
+├── Deep_Research_Agent.md      (6 parallel dimensions, quality gates)
+├── AI_Framing_Agent.md         (AI/ML products only)
+├── PRFAQ_Guide.md
+├── PRD_Creation_Guide.md       (includes Technology Research)
+├── Prototype_Spec_Guide.md     (interaction blueprint)
+├── Prototype_Creation_Guide.md
+├── Handoff_Schema.md           (inter-phase payload contract)
 └── ProjectDashboard_Template.html / ScreenIndex_Template.html
 
 .claude/                        (native Claude Code layer — thin shims over prompts/)
-├── agents/                     (6 subagents: deep-research, prfaq, prd, design-system, screen-builder, product-reviewer)
-├── skills/                     (4 phase skills: product-research/prfaq/prd/prototype)
+├── agents/                     (7 subagents: deep-research, ai-framing, prfaq, prd, design-system, screen-builder, product-reviewer)
+├── skills/                     (5 phase skills: product-research/ai-framing/prfaq/prd/prototype + regenerate-screen-index utility)
 └── settings.json               (advisory PostToolUse validation hooks — cross-platform, never blocks)
 
 documents/                      (auto-generated outputs — gitignored)
@@ -138,7 +138,7 @@ documents/                      (auto-generated outputs — gitignored)
 ├── MarketResearch_*.html       (Deep Research output)
 ├── PRFAQ_*.html
 ├── PRD_*.html
-├── PrototypeSpec_*.html        (Interaction Spec)
+├── PrototypeSpec_*.html        (Interaction Spec — internal sub-step artifact)
 ├── DesignSystem_*.html
 ├── Screen_*.html
 └── ProjectDashboard_*.html     (live status, regenerated after every phase)
@@ -165,10 +165,12 @@ samples/                        (example outputs for reference)
 
 ## Agent Hooks
 
-`.kiro/hooks.json` defines **16 hooks** in three groups:
+> These hooks are **Kiro mode only**. Claude Code's automated gating is narrower — `.claude/settings.json` runs an advisory JS-syntax gate on `Screen_*.html` and an SVG paint check on `PRD_*.html`; everything else below is enforced by the agent via the prose guides rather than a save-triggered hook. See *Native Claude Code primitives*.
+
+`.kiro/hooks.json` defines **17 hooks** in three groups:
 
 **Automatic validators (trigger on file save):**
-- Market Research Validator, PRFAQ Validator, PRD Validator, Design System Validator, Screen Validator
+- Market Research Validator, PRFAQ Validator, PRD Validator, Prototype Spec Validator, Design System Validator, Screen Validator
 - Kiro Spec Validator (EARS syntax), Tech Stack Validator (prefers AWS-native services)
 
 **Automatic phase transitions (on file save):**
@@ -242,8 +244,8 @@ The workflow loads automatically when you open your project. Just describe your 
 
 Alongside the prose guides, the toolchest ships native Claude Code integration (the guides in `prompts/*.md` remain the single source of truth — these primitives are thin layers over them):
 
-- **Subagents** (`.claude/agents/`) — `deep-research`, `prfaq`, `prd`, `design-system`, `screen-builder`, `product-reviewer`. A full build runs the Orchestrator, which dispatches these per phase. The Prototype phase runs `design-system` once, then one `screen-builder` per screen in parallel — each screen gets its own isolated context.
-- **Skills** (`.claude/skills/`) — `product-research`, `product-prfaq`, `product-prd`, `product-prototype`. A solo user can invoke a single phase's expertise inline; the relevant guide loads only when that phase is active (progressive disclosure).
+- **Subagents** (`.claude/agents/`) — `deep-research`, `ai-framing` (AI/ML products only), `prfaq`, `prd`, `design-system`, `screen-builder`, `product-reviewer`. A full build runs the Orchestrator, which dispatches these per phase. The Prototype phase runs `design-system` once, then one `screen-builder` per screen in parallel — each screen gets its own isolated context.
+- **Skills** (`.claude/skills/`) — `product-research`, `product-ai-framing`, `product-prfaq`, `product-prd`, `product-prototype`. A solo user can invoke a single phase's expertise inline; the relevant guide loads only when that phase is active (progressive disclosure). A utility skill, `regenerate-screen-index`, rebuilds the ScreenIndex hub from the screens actually on disk after screens are added/removed/renamed.
 - **Validation hooks** (`.claude/settings.json`) — on Write/Edit of a `Screen_*.html` a JS syntax gate parses each inline `<script>`; on a `PRD_*.html` an SVG well-formedness + paint check runs. Advisory only (never blocks an edit). **Cross-platform:** it detects the machine and prefers native validators (macOS `osascript`/`xmllint`/`plutil`), falls back to `node --check`/`python3` on Linux/Windows, and if no validator exists it warns and skips rather than silently passing.
 
 No code ships with the toolchest: hooks are inline config in `settings.json` (not committed scripts), and chart libraries are downloaded at build time into the gitignored `documents/lib/`.
@@ -271,15 +273,17 @@ The `samples/` folder includes example outputs from a "TeenFit" project:
 
 ```
 samples/
-├── DesignSystem_TeenFit.html      (design tokens & components)
+├── README.md                      (what each sample demonstrates)
+├── teenfit.css                    (shared design tokens & components — the [product-slug].css standard)
+├── DesignSystem_TeenFit.html      (design tokens & components reference)
 ├── PRFAQ_TeenFit.html             (press release & FAQ)
 ├── PRD_TeenFit.html               (product requirements)
-├── Screen_Dashboard_TeenFit.html  (prototype screen)
-├── Screen_Welcome_TeenFit.html    (prototype screen)
+├── Screen_Dashboard_TeenFit.html  (prototype screen — links teenfit.css)
+├── Screen_Welcome_TeenFit.html    (prototype screen — links teenfit.css)
 └── Screen_WorkoutExecution_TeenFit.html
 ```
 
-Open any sample in your browser to see the output quality and design standards. The Design System sample includes extensive comments explaining the design philosophy.
+The screens model the modular CSS standard: shared tokens and components live in `teenfit.css`, with screen-specific overrides in each file's `<style>` block. (`ClickablePrototype_TeenFit.html` is the sanctioned single-file exception.) Open any sample in your browser to see the output quality and design standards. The Design System sample includes extensive comments explaining the design philosophy.
 
 ## Security
 

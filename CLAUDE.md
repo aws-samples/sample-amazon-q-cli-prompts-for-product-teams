@@ -20,7 +20,7 @@ When the user describes a product idea or asks to start product development, fol
 **Project Dashboard — update after EVERY phase (MANDATORY, do not skip):**
 Create `documents/ProjectDashboard_[Product]_[YYYY-MM-DD].html` at the START (all phases "pending"), then after each phase completes:
 1. Save the phase document
-2. **Regenerate the dashboard wholesale** from its `PHASES` array — update that phase's `status` ("completed") and `doc` (the new filename); re-emit the whole file (progress %, timestamp, links all derive from the array). Never str-replace its structural HTML.
+2. **Regenerate the dashboard wholesale** from its `CONFIG` object — set that phase's card `status` to "completed" and fill its action `href`(s); re-emit the whole file (progress %, timestamp, links all derive from `CONFIG`). Never str-replace its structural HTML.
 3. `open ./documents/ProjectDashboard_[Product]_[YYYY-MM-DD].html`
 4. Tell the user: "Dashboard updated — [Phase] complete."
 
@@ -39,7 +39,7 @@ When building for a recognizable company (Discovery Education, Amazon, Google, e
 
 **⚠️ IMPORTANT: The logo must be for the CUSTOMER company — the company this product is being built FOR. The market research phase contains competitor logos and branding. Do NOT use a competitor's logo. If uncertain which company is the customer, check `customer_company` in the handoff payload or ask the user.**
 
-1. **FIND the CUSTOMER's logo** (see full protocol in `Prototype Creation Guide.md` Step 1.1):
+1. **FIND the CUSTOMER's logo** (see full protocol in `Prototype_Creation_Guide.md` Step 1.1):
    - **Web image search first:** `"[Customer Name]" logo` — most reliable
    - **Schema.org / Clearbit / Wikipedia** — check before scraping
    - **HTML scrape last:** prioritize alt text containing customer name, NOT filenames containing "logo"
@@ -87,6 +87,7 @@ When building for a recognizable company (Discovery Education, Amazon, Google, e
 
 **ScreenIndex placeholders to replace:**
 `[PRODUCT_NAME]`, `[PRODUCT_SLUG]`, `[CUSTOMER_LOGO]`, `[BRAND_PRIMARY]`, `[BRAND_SECONDARY]`, `[BRAND_ACCENT]`, `[DATE]`, `[PROGRESS_PERCENT]`, `[SCREEN_COUNT]`, `[SCREEN_CARDS]`
+(Inside the `[SCREEN_CARDS]` example markup, each card has a per-card `[THUMBNAIL_URL]` — replace it with a real thumbnail or use the no-thumbnail `.screen-preview-placeholder` fallback the template shows. Never leave `[THUMBNAIL_URL]` literal.)
 
 **Fully interactive prototypes (REQUIRED):**
 - All buttons/links navigate to correct screens
@@ -108,18 +109,18 @@ When building for a recognizable company (Discovery Education, Amazon, Google, e
 ## Phase Guides
 
 Load these as needed during each phase:
-- `prompts/Deep Research Agent.md`
-- `prompts/AI Framing Agent.md` (AI/ML products only)
-- `prompts/PRFAQ Guide.md`
-- `prompts/PRD Creation Guide.md`
-- `prompts/Prototype Spec Guide.md` (internal — used by agent during Prototype phase)
-- `prompts/Prototype Creation Guide.md`
+- `prompts/Deep_Research_Agent.md`
+- `prompts/AI_Framing_Agent.md` (AI/ML products only)
+- `prompts/PRFAQ_Guide.md`
+- `prompts/PRD_Creation_Guide.md`
+- `prompts/Prototype_Spec_Guide.md` (internal — used by agent during Prototype phase)
+- `prompts/Prototype_Creation_Guide.md`
 
 ## Native Claude Code Primitives
 
 This repo ships native Claude Code integration alongside the prose guides (single source of truth remains `prompts/*.md`):
-- **Subagents** (`.claude/agents/`): `deep-research`, `prfaq`, `prd`, `design-system`, `screen-builder` (parallel, one per screen), `product-reviewer`.
-- **Skills** (`.claude/skills/`): `product-research`, `product-prfaq`, `product-prd`, `product-prototype` — auto-load the relevant guide when that phase is active.
+- **Subagents** (`.claude/agents/`): `deep-research`, `ai-framing` (AI/ML products only), `prfaq`, `prd`, `design-system`, `screen-builder` (parallel, one per screen), `product-reviewer`.
+- **Skills** (`.claude/skills/`): `product-research`, `product-ai-framing`, `product-prfaq`, `product-prd`, `product-prototype` — auto-load the relevant guide when that phase is active. Utility: `regenerate-screen-index` rebuilds the ScreenIndex hub from the `Screen_*.html` files actually on disk.
 - **Validation hooks** (`.claude/settings.json`): on Write/Edit of `Screen_*.html` the JS syntax gate runs; on `PRD_*.html` the SVG paint check runs. Advisory (never blocks). Cross-platform: prefers native validators (macOS `osascript`/`xmllint`/`plutil`), falls back to `node`/`python3` on Linux/Windows, and honest-skips with a warning if none are present.
 
 ## Sample Outputs

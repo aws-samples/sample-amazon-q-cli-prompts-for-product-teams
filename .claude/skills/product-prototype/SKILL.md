@@ -5,7 +5,7 @@ description: Use when building the interactive HTML prototype — shared CSS, de
 
 # Interactive Prototype
 
-Authoritative guide: `prompts/Prototype Creation Guide.md` (build order, interactivity, Step 9.5 post-build + syntax gate). Shared standards: `prompts/Shared Standards.md`.
+Authoritative guide: `prompts/Prototype_Creation_Guide.md` (build order, interactivity, Step 9.5 post-build + syntax gate). Shared standards: `prompts/Shared_Standards.md`.
 
 Build order (strict): shared `[product-slug].css` → `DesignSystem_*.html` → Design Token Contract → screen manifest + sidebar shell + Content Link Map → `Screen_*.html` (one per screen) → `ScreenIndex_*.html`.
 
